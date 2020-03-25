@@ -1,6 +1,6 @@
 # 《强国助手》说明文档
 
-当前最新版本：V1.0.5
+当前最新版本：V1.1.0
 
 ## 免责声明
 
@@ -62,11 +62,13 @@ Readme.md —— 《强国助手》说明文档
 
 7.本地频道
 
-8.文章学习时长（可选）
+8.每日答题
 
-9.视听学习时长（可选）
+9.文章学习时长（可选）
 
-在当日未执行所有任务的情况下，脚本完成任务1-7预计花费7分钟。
+10.视听学习时长（可选）
+
+在当日未执行所有任务的情况下，脚本完成任务1-8预计花费9分钟。
 
 脚本完成任务8预计花费12分钟。
 
@@ -74,16 +76,15 @@ Readme.md —— 《强国助手》说明文档
 
 **未实现的任务功能**包括：
 
-1.每日答题
+1.每周答题
 
-2.每周答题
+2.专项答题
 
-3.专项答题
-
-4.挑战答题
+3.挑战答题
 
 ### 强国助手APP更新日志
 
+- V1.1.0：新增每日答题任务功能
 - V1.0.5：新增悬浮窗日志显示功能，解决阅读时长任务的bug，新增选项菜单
 - V1.0.4：解决手机主界面UI字符的屏幕适配问题，解决获取任务列表不稳定的问题
 - V1.0.3：更新脚本应用的UI效果，增加用户手机息屏检测和屏幕激活，增加看视频时用户是否使用手机流量的检测机制，解决不能首次执行长时阅读任务的BUG
@@ -133,9 +134,9 @@ oppo A59s（安卓5.1）
 
 **使用效果：**
 
-1.软件主页（V1.0.0）：
+1.软件主页（V1.1.0）：
 
-<img src="./Images/脚本主页.jpg" width="300" />
+<img src="./Images/脚本主页V1.1.0.jpg" width="300" />
 
 2.使用过程静态展示：
 
@@ -149,8 +150,7 @@ oppo A59s（安卓5.1）
 </figure>
 
 
-
-3.使用过程动态展示：(可见Image文件夹中的视频文件)
+3.使用过程动态展示：(以V1.0.0为例，可见Image文件夹中的视频文件)
 
 <img src="./Images/使用过程动态展示.gif" width="300" />
 
@@ -197,7 +197,7 @@ JS入门：https://www.bilibili.com/video/av35958121
 
 控件操作：https://www.bilibili.com/video/av37314451
 
-以下代码均以强国助手V１.０.０脚本应用版本为例，最新版本的代码参见ＡｕｔｏＬｅａｒｎＣｈｉｎａ．ｊｓ
+以下代码均以强国助手V1.1.0脚本应用版本为例，最新版本的代码参见AutoLearnChina.js
 
 ### 1.UI部分
 
@@ -212,54 +212,120 @@ var form = {
 ui.layout(
     <vertical>
         <appbar>
-            <toolbar title="强国助手"/>
+            <toolbar id="toolbar" title="强国助手 V1.1.0"/>
         </appbar>
         <Switch id="autoService" text="无障碍服务" checked="{{auto.service != null}}" padding="8 8 8 8" textSize="15sp"/>
-        <frame height="50" gravity="center">
+        <ScrollView>
+        <vertical>
+        <frame height="40" gravity="center">
             <text text="*注意*" gravity="center" textSize="18sp" textColor="red" textStyle="bold"/>
         </frame>
-        <frame height="50" gravity="center">
-            <text text="使用前请先开启本应用的无障碍服务和截图权限" gravity="center"/>
-        </frame>
-        <frame height="50" gravity="center">
-            <text text="脚本执行过程中请勿操作手机" gravity="center"/>
-        </frame>
-        <frame height="50" gravity="center">
-            <text text="目前强国助手支持的功能包括：(以下任务预计花费7分钟)" gravity="center"/>
-        </frame>
-        <frame height="50" gravity="center">
-            <text text="阅读文章、视听学习、收藏、分享、订阅、评论、本地频道" gravity="center"/>
-        </frame>
-        <frame height="80" gravity="center">
-            <text text="坚持把学习贯彻习近平总书记系列重要讲话精神作为重大政治任务，认真学习党的先进理论与指导思想，请勿利用本软件投机取巧" gravity="center"/>
+        <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+            cardElevation="1dp" gravity="center_vertical">
+            <ScrollView>
+            <vertical padding="18 8" h="auto">
+                <text text="项目说明文档: (请留意新版本的发布)" textColor="#222222" textSize="14sp"/>
+                <text autoLink="web" text="https://github.com/XiangyuTang/LearnChinaHelper "/>
+            </vertical>
+            </ScrollView>
+            <View bg="#f44336" h="*" w="10"/>
+        </card>
+        <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+            cardElevation="1dp" gravity="center_vertical">
+            <ScrollView>
+            <vertical padding="18 8" h="auto">
+                <text text="1.首次安装请先开启无障碍服务和截图与允许通知权限" textColor="#222222" textSize="14sp"/>
+                <text text="2.若未开启通知权限,首次使用建议打开↗的悬浮窗权限" textColor="#222222" textSize="14sp"/>
+                <text text="3.开始运行前请先关闭学习强国,由脚本运行后自动启动" textColor="#222222" textSize="14sp"/>
+                <text text="4.脚本执行过程中请勿操作手机" textColor="#222222" textSize="14sp"/>
+            </vertical>
+            </ScrollView>
+            <View bg="#f44336" h="*" w="10"/>
+        </card>
+        <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+            cardElevation="1dp" gravity="center_vertical">
+            <ScrollView>
+            <vertical padding="18 8" h="auto">
+                <text text="当前版本强国助手支持的功能包括：(以下任务预计花费9分钟)" textColor="#222222" textSize="14sp"/>
+                <text text="阅读文章、视听学习、收藏、分享、订阅、评论、本地频道、每日答题" textColor="#999999" textSize="14sp"/>
+            </vertical>
+            </ScrollView>
+            <View bg="#4caf50" h="*" w="10"/>
+        </card>
+        <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+            cardElevation="1dp" gravity="center_vertical">
+            <ScrollView>
+            <vertical padding="18 8" h="auto">
+                <text text="坚持把学习贯彻习近平总书记系列重要讲话精神作为重大政治任务，认真学习党的先进理论与指导思想，请勿利用本软件投机取巧." textColor="#222222"/>
+            </vertical>
+            </ScrollView>
+            <View bg="#4caf50" h="*" w="10"/>
+        </card>
+        <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+            cardElevation="1dp" gravity="center_vertical">
+            <ScrollView>
+            <vertical padding="18 8" h="auto">
+                <text text="是否执行文章学习时长任务：(预计最多花费12分钟)" textColor="#222222"/>
+                <radiogroup id="long_read">
+                        <radio id="yes_read"  text="是"></radio>
+                        <radio  id="no_read" text="否" checked = "true"></radio>
+                </radiogroup>
+            </vertical>
+            </ScrollView>
+            <View bg="#2196f3" h="*" w="10"/>
+        </card>
+        <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+            cardElevation="1dp" gravity="center_vertical">
+            <ScrollView>
+            <vertical padding="18 8" h="auto">
+                <text text="是否执行视听学习时长任务：(建议在wifi环境下执行，预计最多花费18分钟)" textColor="#222222"/>
+                <radiogroup id="long_watch">
+                        <radio id="yes_watch"  text="是"></radio>
+                        <radio id="no_watch" text="否" checked = "true"></radio>
+                </radiogroup>
+            </vertical>
+            </ScrollView>
+            <View bg="#2196f3" h="*" w="10"/>
+        </card>
+        <linear gravity="center">
+            <button id="start" text="开始运行" style="Widget.AppCompat.Button.Colored" w="auto"/>
+            <button id="stop" text="停止运行"  w="auto"/>
+        </linear>
+        <frame height="20" gravity="center">
+            <text text="---------------------------------------------------------------------------------------------------------------------------------" gravity="center"/>
         </frame>
         <frame height="50" gravity="center">
             <text text="Copyright©2020 by Txy 一岸流年1998" gravity="center"/>
         </frame>
-        <frame height="20" gravity="center">
-            <text text="---------------------------------------------------------------------------------------------------------------------------------" gravity="center"/>
-        </frame>
-        <vertical>
-        <text text="是否执行文章学习时长任务：(预计最多花费12分钟)"/>
-        <radiogroup id="long_read">
-            <radio id="yes_read"  text="是"></radio>
-            <radio  id="no_read" text="否" checked = "true"></radio>
-        </radiogroup>
         </vertical>
-        <vertical>
-        <text text="是否执行视听学习时长任务：(预计最多花费18分钟)"/>
-        <radiogroup id="long_watch">
-            <radio id="yes_watch"  text="是"></radio>
-            <radio  id="no_watch" text="否" checked = "true"></radio>
-        </radiogroup>
-        </vertical>
-        <frame height="20" gravity="center">
-            <text text="---------------------------------------------------------------------------------------------------------------------------------" gravity="center"/>
-        </frame>
-        <button id="start" text="开始运行" textColor="blue" textStyle="bold"/>
-        <button id="stop" text="停止运行" />
+        </ScrollView>
     </vertical>
 );
+
+//创建选项菜单(右上角)
+ui.emitter.on("create_options_menu", menu=>{
+    menu.add("启动悬浮窗");
+    menu.add("运行日志");
+    menu.add("关于");
+});
+//监听选项菜单点击
+ui.emitter.on("options_item_selected", (e, item)=>{
+    switch(item.getTitle()){
+        case "启动悬浮窗":
+            var intent = new Intent();
+            intent.setAction("android.settings.action.MANAGE_OVERLAY_PERMISSION");
+            app.startActivity(intent);
+            break;
+        case "运行日志":
+            app.startActivity('console');
+            break;
+        case "关于":
+            alert("关于", "强国助手 v1.1.0\n1.新增每日答题任务功能");
+            break;
+    }
+    e.consumed = true;
+});
+activity.setSupportActionBar(ui.toolbar);
 
 ui.yes_read.on("check",function(check){
     if(check){
@@ -305,7 +371,6 @@ ui.start.on("click", function(){
         toastLog("请先开启无障碍服务！");
         return;
     }
-
     main();
 });
 
@@ -321,24 +386,23 @@ ui.stop.on("click",function(){
 
 ```javascript
 function main() {
-
     // 这里写脚本的主逻辑
     threads.start(function () {
         if(!requestScreenCapture()){
             toastLog("请先开启截图权限，以执行收藏任务！");
-            toastLog("运行结束,脚本自动退出...");
-            exit();
+            return;
         }
-        toastLog("主程序开始运行");
         try {
-            //检查无障碍服务是否已经启用,如果没启动,跳转到启动界面,启动后继续执行
-            // auto.waitFor(); 
+            //启动悬浮窗日志
+            console.show();
             launchApp("学习强国");
+            toastLog("主程序开始运行");
             waitForPackage("cn.xuexi.android");
             sleep(3000);
             toast("开始执行脚本！")
             getTaskList(); // 获取任务列表
             doUnfinishedTask(); //执行当日未完成的任务
+            getTaskList(); // 重新获取任务列表,装载最新的阅读和视听时长剩余次数
             doExtraTask();
             back();//回到手机主页
             sleep(2000);
@@ -349,10 +413,12 @@ function main() {
         }
         toastLog("运行结束,脚本自动退出...");
         threads.shutDownAll();
+        console.hide();
         engines.stopAll();
         exit();
     });
 }
+
 ```
 
 ### 3.getTaskList(); // 获取任务列表
@@ -360,22 +426,29 @@ function main() {
 主要得到当日还未达到满分的任务，将其存入taskInfoList数组。
 
 ```javascript
+var taskInfoList = [];
 function getTaskList() {
-    toastLog("执行获取任务列表")
     // 从主页到我的主页
     className("android.widget.TextView").id('comm_head_xuexi_mine').findOne().click();
     sleep(2000);
     // 点击事件在我的积分父控件上
     id("user_item_name").text("学习积分").findOne().parent().click()
     // waitForPackage("cn.xuexi.android")
-    waitForActivity("com.alibaba.lightapp.runtime.activity.CommonWebViewActivity")
-    sleep(3000);
-    toastLog("获取任务列表...")
+    //waitForActivity("com.alibaba.lightapp.runtime.activity.CommonWebViewActivity")
+    toastLog("尝试获取任务列表...")
+    //等待缓冲符号消失
+    sleep(2000);
+    while(className("android.widget.ImageView").exists())
+    {
+        sleep(1000);
+        toastLog("等待加载...")
+    }
+    // sleep(8000);
     // 获取任务列表
     taskInfoList = []; // 重置
     className("android.widget.ListView").findOne().children().forEach(function (child) {
         var list = child.find(className('android.view.View'));
-        log(list)
+        // log(list)
         if (list.length > 5) {
             var title = list.get(2).contentDescription;
             var content = list.get(4).contentDescription;
@@ -392,7 +465,7 @@ function getTaskList() {
         }
     });
     if (!taskInfoList.length) {
-        toastLog('获取任务失败！请关闭应用并重启脚本...');
+        toastLog('网络不稳定,获取任务失败！请关闭应用并重启脚本...');
         threads.shutDownAll();
         engines.stopAll();
         exit(); // 有异常退出，结束脚本
@@ -405,6 +478,7 @@ function getTaskList() {
         sleep(2000);
     }
 };
+
 ```
 
 ### 4.doUnfinishedTask(); //执行当日未完成的任务
@@ -434,8 +508,7 @@ function doUnfinishedTask(){
                 continue;
             }
             else if(task.title=='每日答题'){
-                sleep(2000)
-                toastLog('开始执行每日答题任务(暂未开发)')
+                doDailyQuiz();
                 continue;
             }
             else if(task.title=='每周答题'){
@@ -478,6 +551,47 @@ function doUnfinishedTask(){
         toastLog('已完成当日所有脚本任务！d=====(￣▽￣*)b')
     }
 };
+```
+
+### 5.doExtraTask()//执行用户选定的额外任务
+
+该函数是进入阅读时长和视听时长任务的入口函数。
+
+```javascript
+function doExtraTask(){
+    toastLog('执行额外脚本任务....')
+    sleep(1000);
+    var read_article_flag = 2;
+    if(form.isLongRead)
+    {
+        read_article_flag = 2;
+        toastLog("开始执行文章学习时长任务...")
+        sleep(1000);
+        //读rest_num篇文章，每篇文章阅读125s
+        for(i=0;i<taskInfoList.length;i++){
+            var task = taskInfoList[i];
+            if(task.getIntegral < task.targetIntegral&&task.title=='文章学习时长'){
+                rest_num = task.targetIntegral-task.getIntegral;
+                readArticle1(rest_num,125,true);
+            }
+        }
+    }
+    if(form.isLongWatch)
+    {
+        toastLog("开始执行视听学习时长任务...");
+        sleep(1000);
+        //看rest_num个视频，每个视频观看185s
+        for(i=0;i<taskInfoList.length;i++){
+            var task = taskInfoList[i];
+            if(task.getIntegral < task.targetIntegral&&task.title=='视听学习时长'){
+                rest_num = task.targetIntegral-task.getIntegral;
+                learnVideo(rest_num,read_article_flag,185,true);
+            }
+        }
+        
+    }
+    toastLog('额外任务执行完成！d=====(￣▽￣*)b')
+}
 ```
 
 之后的部分则是实现各个功能的方法介绍。
@@ -1053,5 +1167,571 @@ function collect(){
     id("home_bottom_tab_button_work").findOne().click();
     sleep(1000);
 };
+```
+
+### 9.每日答题模块
+
+这部分的函数分为了dailyQuiz()和doDailyQuiz(),第二个是接口引导与dailyQuiz()的入口函数，答题任务的主要难点在于题型的种类关系复杂，答案的花样繁多，并且控件经常变化。
+
+需要列出的题型是：
+
+**1.单选题**
+
+选项特征：除正常情况外，还有理解题型、判断对错，看视频，“以上都对/错”。
+
+思路：利用字符串匹配，先获得提示中的字符串，用选项字符串扔进提示字符串中进行子串查找，找到说明就匹配上了，需要记录匹配的选项数量，只有1个匹配上最正常，如果匹配选项数组的长度=选项数组的长度-1，那么极有可能出现类似“以上都对”的情况，其他情况上匹配数组长度为0或<选项数组的长度-1,若为0则随便选，若<选项数组的长度-1（比如4个选项有两个匹配上，但这是单选），那么选择匹配选项数组中的第一个作为结果。理解题型、判断对错、看视频暂时没有解决方案，故随机选择答案。
+
+**2.多选题**
+
+选项特征：4选3或者3选2或全选，理解题型
+
+思路：与单选类似是字符串的子串查找，勾选能匹配选项即可。
+
+**3.填空题**
+
+选项特征：空的数目不统一，空的长度不统一，理解题型，看视频
+
+思路：构造空(kòng)对象,
+
+var ans = {
+            index:0,//空的起始位置索引
+            len: 0,//空的长度
+            prefix: "",//空的前缀
+            postfix:""//空的后缀
+        }
+
+然后找到题目内容控件，以EditText为目标，构建空对象，构建结束后，针对每一个空进行遍历，利用空的前后缀匹配在提示中进行子串查找，优先进行前缀匹配，前缀匹配中优先进行空的前3、2、1个字符匹配，前缀匹配没找到答案或者无前缀的，进行后缀匹配。如果无法找到答案，直接使用提示中的前len个长度的字符作为结果。
+
+```javascript
+/**
+ * @function dailyQuiz 每日答题任务
+ */
+function dailyQuiz() {
+    //多选题
+    // sleep(1000);
+    if (desc("多选题").exists()) {
+        sleep(1000);
+        log("多选");
+        desc("查看提示").click()
+        sleep(1000);
+        var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
+        while(hint.desc()=="")
+        {
+            toastLog("重新搜索提示...");
+            back()
+            sleep(1000);
+            desc("查看提示").click();
+            sleep(1000);
+            hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
+        }
+        log("提示："+hint.desc())
+        back()
+        sleep(1000)
+        // let similarities = []
+        var final_answer= ""
+        var options = [];
+        var match_options= [];
+        className("android.widget.ListView").findOne().children().forEach(function(child) {
+            var option = child.child(0).child(2).desc();
+            log("options:"+option)
+            options.push(option)
+            var start = hint.desc().indexOf(option);//获得option字符串在hint.desc()字符串中的开始位置
+            if(start!=-1){//找到了
+                match_options.push(option);
+            }
+        });
+        log("match_options:"+match_options)
+        //找到多个匹配选项
+        if(match_options.length>0)
+        {
+            log("找到多个匹配选项")
+            //逐个点击正确答案
+            className("android.widget.ListView").findOne().children().forEach(child => {
+                var answer = child.child(0).child(2).desc();
+                sleep(1000)
+                for(var i=0;i<match_options.length;i++)
+                {
+                    if (answer == match_options[i]) {
+                        child.child(0).child(1).click();
+                        sleep(500);
+                    }
+                }
+                
+            });
+        }
+        //再点击查看提示来激活确定的控件，不然找不到这个控件
+        desc("查看提示").click();
+        sleep(1000);
+        back();
+        sleep(2000);
+        var confirm = descContains("确定").findOnce();
+        if(confirm!=null){
+            confirm.click();
+            sleep(2000);
+        }
+        if (desc("下一题").exists()) {
+            desc("下一题").click();
+            sleep(2000);
+        }
+        if (desc("完成").exists()) {
+            desc("完成").click();
+            sleep(2000);
+        }
+    }
+    // sleep(1000);
+    if (desc("填空题").exists()) {
+        log("填空");
+        sleep(1000);
+        //点击提示按钮
+        desc("查看提示").findOne().click()
+        sleep(1000);
+        
+        var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
+        back();
+        sleep(1000);
+        while(hint.desc()=="")
+        {
+            toastLog("重新搜索提示...");
+            desc("查看提示").click();
+            sleep(1000);
+            hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
+            back();
+            sleep(1000);
+        }
+        var video_flag = 0;
+        log("提示："+hint.desc())
+        if(hint.desc()=="请观看视频"){
+            video_flag = 1;
+        }
+        //构造空的对象
+        var ans = {
+            index:0,//空的起始位置索引
+            len: 0,//空的长度
+            prefix: "",//空的前缀
+            postfix:""//空的后缀
+        }
+        //构造存放题目特征数组
+        var ans_group= [];
+        var content_view = className("android.view.View").depth(23).findOnce(2);
+        log("content_view:"+content_view);
+        content_view.children().forEach(function(child,index){
+            //找到有几个空，并确定每个空的长度
+            // log(child.desc());
+            //找到了android.widget.EditText
+            if(child.desc()==null&&child.className()=="android.widget.EditText"){
+                //获取空的索引
+                ans.index = index
+                //获得空的前缀
+                if(index>0){
+                    ans.prefix = content_view.child(index-1).desc()
+                }
+                // 获取空的长度
+                var i = index
+                ans.len = 0;
+                while(content_view.child(i+1).desc()=="")
+                {
+                    ans.len++;
+                    i++;
+                }
+                ans.postfix = content_view.child(i+1).desc();
+                ans_group.push({
+                    index:ans.index,
+                    len:ans.len,
+                    prefix:ans.prefix,
+                    postfix:ans.postfix
+                });
+            }
+        })
+        log(ans_group)
+        var result = "";
+        for(var i=0;i<ans_group.length;i++)
+        {
+            var blank = ans_group[i];
+            var pre_chars = "";
+            var post_chars = "";
+            if(video_flag)//遇到看视频，无能为力了
+            {
+                result = hint.desc().substring(0,blank.len);
+                log("观看看视频的result:"+result);
+                //填上result
+                content_view.child(blank.index).setText(result);
+                sleep(500);
+                continue;
+            }
+            //取空的前3个字符，即前缀的最后3个字符
+            if(blank.prefix.length>3){
+                pre_chars = blank.prefix.substring(blank.prefix.length-3,blank.prefix.length);
+                log(pre_chars)
+                start = hint.desc().indexOf(pre_chars);
+                if(start!=-1){//说明找到了
+                    start = start+pre_chars.length;
+                    result = hint.desc().substring(start,start+blank.len);
+                    log("result:"+result);
+                    //填上result
+                    content_view.child(blank.index).setText(result);
+                    sleep(500);
+                    continue;
+                }
+                else{//没找到，缩小前缀匹配范围
+                    pre_chars = blank.prefix.substring(blank.prefix.length-2,blank.prefix.length);
+                    start = hint.desc().indexOf(pre_chars);
+                    if(start!=-1){//说明找到了
+                        start = start+pre_chars.length;
+                        result = hint.desc().substring(start,start+blank.len);
+                        log("result:"+result);
+                        //填上result
+                        content_view.child(blank.index).setText(result);
+                        sleep(500);
+                        continue;
+                    }
+                    else{//继续缩小匹配范围
+                        pre_chars = blank.prefix.substring(blank.prefix.length-1,blank.prefix.length);
+                        start = hint.desc().indexOf(pre_chars);
+                        if(start!=-1){//说明找到了
+                            start = start+pre_chars.length;
+                            result = hint.desc().substring(start,start+blank.len);
+                            log("result:"+result);
+                            //填上result
+                            content_view.child(blank.index).setText(result);
+                            sleep(500);
+                            continue;
+                        }
+                        else{//直接选提示的前几个字符作为答案
+                            log("前缀匹配未找到符合条件的结果...")
+                            result = hint.desc().substring(0,blank.len);
+                            log("result:"+result);
+                            content_view.child(blank.index).setText(result);
+                            sleep(500);
+                            continue;
+                        }
+                    }
+                }
+            }//如果前缀长度2，那就取空的前2个
+            else if(blank.prefix.length==2){
+                pre_chars = blank.prefix.substring(blank.prefix.length-2,blank.prefix.length);
+                    start = hint.desc().indexOf(pre_chars);
+                    if(start!=-1){//说明找到了
+                        start = start+pre_chars.length;
+                        result = hint.desc().substring(start,start+blank.len);
+                        log("result:"+result);
+                        //填上result
+                        content_view.child(blank.index).setText(result);
+                        sleep(500);
+                        continue;
+                    }
+                    else{//继续缩小匹配范围
+                        pre_chars = blank.prefix.substring(blank.prefix.length-1,blank.prefix.length);
+                        start = hint.desc().indexOf(pre_chars);
+                        if(start!=-1){//说明找到了
+                            start = start+pre_chars.length;
+                            result = hint.desc().substring(start,start+blank.len);
+                            log("result:"+result);
+                            //填上result
+                            content_view.child(blank.index).setText(result);
+                            sleep(500);
+                            continue;
+                        }
+                        else{//直接选提示的前几个字符作为答案
+                            log("前缀匹配未找到符合条件的结果...")
+                            result = hint.desc().substring(0,blank.len);
+                            log("result:"+result);
+                            content_view.child(blank.index).setText(result);
+                            sleep(500);
+                            continue;
+                        }
+                    }
+            }//如果前缀长度1，那就取空的前1个
+            else if(blank.prefix.length==1){
+                pre_chars = blank.prefix.substring(blank.prefix.length-1,blank.prefix.length);
+                start = hint.desc().indexOf(pre_chars);
+                if(start!=-1){//说明找到了
+                    start = start+pre_chars.length;
+                    result = hint.desc().substring(start,start+blank.len);
+                    log("result:"+result);
+                    //填上result
+                    content_view.child(blank.index).setText(result);
+                    sleep(500);
+                    continue;
+                }
+                else{//直接选提示的前几个字符作为答案
+                    log("前缀匹配未找到符合条件的结果...")
+                    result = hint.desc().substring(0,blank.len);
+                    log("result:"+result);
+                    content_view.child(blank.index).setText(result);
+                    sleep(500);
+                    continue;
+                }
+            }
+            //如果没有前缀，则用后缀匹配
+            else if(blank.prefix.length==0){
+                //若后缀长度>3,一般情况下如果前缀=0,后缀都>3
+                if(blank.postfix.length>3){
+                    post_chars = blank.postfix.substring(0,3);
+                    log(post_chars)
+                    start = hint.desc().indexOf(post_chars);
+                    if(start!=-1){//说明找到了
+                        start = start-post_chars.length;
+                        result = hint.desc().substring(start,start+blank.len);
+                        log("result:"+result);
+                        //填上result
+                        content_view.child(blank.index).setText(result);
+                        sleep(500);
+                        continue;
+                    }
+                    else{//缩小后缀匹配的范围
+                        post_chars = blank.postfix.substring(0,2);
+                        log(post_chars)
+                        start = hint.desc().indexOf(post_chars);
+                        if(start!=-1){//说明找到了
+                            start = start-post_chars.length;
+                            result = hint.desc().substring(start,start+blank.len);
+                            log("result:"+result);
+                            //填上result
+                            content_view.child(blank.index).setText(result);
+                            sleep(500);
+                            continue;
+                        }
+                        else{//再缩小后缀匹配的范围
+                            post_chars = blank.postfix.substring(0,1);
+                            log(post_chars)
+                            start = hint.desc().indexOf(post_chars);
+                            if(start!=-1){//说明找到了
+                                start = start-post_chars.length;
+                                result = hint.desc().substring(start,start+blank.len);
+                                log("result:"+result);
+                                //填上result
+                                content_view.child(blank.index).setText(result);
+                                sleep(500);
+                                continue;
+                            }
+                            else{//直接选提示的前几个字符作为答案
+                                log("后缀匹配未找到符合条件的结果...")
+                                result = hint.desc().substring(0,blank.len);
+                                log("result:"+result);
+                                content_view.child(blank.index).setText(result);
+                                sleep(500);
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        sleep(2000);
+        var confirm = descContains("确定").findOnce();
+        if(confirm!=null){
+            confirm.click();
+            sleep(2000);
+        }
+        if (desc("下一题").exists()) {
+            desc("下一题").click();
+            sleep(2000);
+        }
+        if (desc("完成").exists()) {
+            desc("完成").click();
+            sleep(2000);
+        }
+    } 
+    //单选题
+    // sleep(1000);
+    if (desc("单选题").exists()) {
+        sleep(1000);
+        log("单选")
+        desc("查看提示").click()
+        sleep(1000);
+        // var hint = className("android.view.View").depth(21).indexInParent(1).drawingOrder(0).findOne().child(0).desc()
+        var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
+        while(hint.desc()=="")
+        {
+            toastLog("重新搜索提示...");
+            back()
+            sleep(1000);
+            desc("查看提示").click();
+            sleep(1000);
+            hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
+        }
+        log("提示："+hint.desc())
+        back()
+        sleep(1000)
+        // let similarities = []
+        var final_answer= ""
+        var options = [];
+        var match_options= [];
+        className("android.widget.ListView").findOne().children().forEach(function(child) {
+            var option = child.child(0).child(2).desc();
+            log("options:"+option)
+            options.push(option)
+            var start = hint.desc().indexOf(option);//获得option字符串在hint.desc()字符串中的开始位置
+            if(start!=-1){//找到了
+                match_options.push(option);
+            }
+        });
+        log("match_options:"+match_options);
+        //根据选项的匹配数量确定答案
+        if(match_options.length==1)
+        {
+            log("找到了唯一一个匹配结果");
+            final_answer = match_options[0];
+        }
+        //如果出现多个匹配选项，但不是全部选项,且只剩一个选项不匹配，即可能出现“以上都是”的情况
+        else if(match_options.length>1&&match_options.length==options.length-1)
+        {
+            log("找到多个匹配选项")
+            for(var i=0;i<options.length;i++){
+                var flag = 0;
+                for(var j=0;j<match_options.length;j++){
+                    if(options[i]==match_options[j]){
+                        flag = 1;
+                        break;
+                    }
+                }
+                //说明出现了“以上都是”的选项
+                if(flag==0)
+                {
+                    final_answer = options[i];
+                    break;
+                }
+            }
+        }
+        //其他未知情况，默认选择第一个匹配的结果
+        else{
+            log("其余情况");
+            if(match_options.length>0)
+            {
+                log("match_options.length:"+match_options.length+",默认选择匹配结果的第一个");
+                final_answer = match_options[0];
+            }
+            else
+            {
+                //比如判断题，随便选一个
+                log("不存在匹配成功的结果，随机选择一个");
+                final_answer = options[random(0,options.length-1)];
+            }
+        }
+        log("final_answer:"+final_answer)
+        
+        //点击正确答案
+        className("android.widget.ListView").findOne().children().forEach(child => {
+            var answer = child.child(0).child(2).desc();
+            if (final_answer === answer) {
+                child.child(0).child(1).click();
+                sleep(2000);
+            }
+        });
+
+        //再点击查看提示来激活确定的控件，不然找不到这个控件
+        desc("查看提示").click();
+        sleep(1000);
+        back();
+        sleep(2000);
+        var confirm = descContains("确定").findOnce();
+        if(confirm!=null){
+            confirm.click();
+            sleep(2000);
+        }
+        if (desc("下一题").exists()) {
+            desc("下一题").click();
+            sleep(2000);
+        }
+        if (desc("完成").exists()) {
+            desc("完成").click();
+            sleep(2000);
+        }
+    }
+}
+/**
+ * @function doDailyQuiz 进入每日答题任务的主函数
+ */
+function doDailyQuiz()
+{
+    toastLog('开始执行每日答题任务...')
+    sleep(1000);
+    // 从主页到我的主页
+    className("android.widget.TextView").id('comm_head_xuexi_mine').findOne().click();
+    sleep(2000);
+    // 点击事件在我的积分父控件上
+    id("user_item_name").text("我要答题").findOne().parent().click();
+    sleep(1000);
+    //若没加载出来控件，则循环等待界面加载完毕
+    while(!desc("奖励积分").exists())
+    {
+        sleep(1000);
+        toastLog("等待加载...");
+    }
+    if(desc("title4@2x.a9778133").exists())//如果出现“每日答题改版啦弹出框”
+    {
+        log("出现“每日答题改版啦弹出框”")
+        var iknow = className("android.view.View").clickable(true).depth(22).findOne().parent();
+        log(iknow)
+        click(iknow.bounds().centerX(),iknow.bounds().centerY());
+        sleep(1000);
+    }
+    //找到每日答题控件，点击进入
+    desc("每日答题").findOne().click();
+    sleep(2000);
+    while(!className("android.view.View").desc("本次答对题目数").exists()){
+        sleep(1000);
+        dailyQuiz();
+        sleep(2000);
+    }
+    toastLog("等候3s加载页面...")
+    sleep(3000);
+    if(className("android.view.View").desc("领取奖励已达今日上限").depth(21).exists())
+    {
+        log("出现 领取奖励已达今日上限")
+        sleep(1000);
+        var ret = className("android.widget.Button").desc("返回").findOne();//bounds = (99,1165,533,1286)
+        sleep(2000);
+        ret.click();
+        sleep(2000);
+        ret = className("android.view.View").depth(21).findOne();//bounds = (49,123,115,189)
+        sleep(2000);
+        click(ret.bounds().centerX(),ret.bounds().centerY());
+        sleep(2000);
+        back();//退到我的
+        sleep(2000);
+        toastLog('每日答题任务执行结束！d==(￣▽￣*)b')
+        back();//退到 主页
+        sleep(2000);
+        //点击学习控件回到新闻首页
+        id("home_bottom_tab_button_work").findOne().click();
+        sleep(2000);
+    }
+    else{
+        log("未出现 领取奖励已达今日上限")
+        sleep(1000);
+        var ret = className("android.widget.Button").desc("再来一组").findOne();
+        sleep(1000);
+        click(ret.bounds().centerX(),ret.bounds().centerY());
+        sleep(1000);
+        //再来一组
+        while(!className("android.view.View").desc("本次答对题目数").exists()){
+            sleep(1000);
+            dailyQuiz();
+            sleep(2000);
+        }
+        toastLog("等候5s加载页面...")
+        sleep(5000);
+        //两组结束，直接回退
+        var ret = className("android.widget.Button").desc("返回").findOne();//bounds = (99,1165,533,1286)
+        sleep(1000);
+        ret.click();
+        sleep(2000);
+        ret = className("android.view.View").depth(21).findOne();//bounds = (49,123,115,189)
+        sleep(2000);
+        click(ret.bounds().centerX(),ret.bounds().centerY());
+        sleep(2000);
+        back();//退到 我的
+        sleep(2000);
+        toastLog('每日答题任务执行结束！d==(￣▽￣*)b')
+        back();//退到 主页
+        sleep(2000);
+        //点击学习控件回到新闻首页
+        id("home_bottom_tab_button_work").findOne().click();
+        sleep(2000);
+    }
+    
+}
+
 ```
 
