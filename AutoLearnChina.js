@@ -286,22 +286,6 @@ function doUnfinishedTask(){
                 learnVideo(rest_num,read_article_flag,8,false);//默认观看8s,执行短时视听任务
                 continue;
             }
-            else if(task.title=='每日答题'){
-                doDailyQuiz();
-                continue;
-            }
-            else if(task.title=='每周答题'){
-                doWeeklyQuiz();
-                continue;
-            }
-            else if(task.title=='专项答题'){
-                doSpecialQuiz();
-                continue;
-            }
-            else if(task.title=='挑战答题'){
-                challengeQuiz();
-                continue;
-            }
             else if(task.title=='订阅'){
                 rest_num = task.targetIntegral-task.getIntegral;
                 subscribe(rest_num);
@@ -323,9 +307,23 @@ function doUnfinishedTask(){
                 localChannel();
                 continue;
             }
-            
+            else if(task.title=='每日答题'){
+                doDailyQuiz();
+                continue;
+            }
+            else if(task.title=='每周答题'){
+                doWeeklyQuiz();
+                continue;
+            }
+            else if(task.title=='专项答题'){
+                doSpecialQuiz();
+                continue;
+            }
+            else if(task.title=='挑战答题'){
+                challengeQuiz();
+                continue;
+            }
         }
-
     }
     if(!flag)
     {
