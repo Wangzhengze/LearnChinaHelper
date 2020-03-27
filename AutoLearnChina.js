@@ -6,7 +6,7 @@ var form = {
 ui.layout(
     <vertical>
         <appbar>
-            <toolbar id="toolbar" title="强国助手 V2.0.0"/>
+            <toolbar id="toolbar" title="强国助手 V2.0.1"/>
         </appbar>
         <Switch id="autoService" text="无障碍服务" checked="{{auto.service != null}}" padding="8 8 8 8" textSize="15sp"/>
         <ScrollView>
@@ -114,7 +114,7 @@ ui.emitter.on("options_item_selected", (e, item)=>{
             app.startActivity('console');
             break;
         case "关于":
-            alert("关于", "强国助手 v2.0.0\n1.新增每周答题任务功能\n2.新增专项答题任务功能\n3.新增挑战答题任务功能\n4.新增收藏和评论任务擦除痕迹功能");
+            alert("关于", "强国助手 v2.0.1\n1.优化答题模块的速度\n2.修复每周答题第一次没得满分后重做失败的bug\n3.修复专项答题第一次没得满分后重做失败的bug\n");
             break;
     }
     e.consumed = true;
@@ -1367,9 +1367,8 @@ function doDailyQuiz()
     }
     //找到每日答题控件，点击进入
     desc("每日答题").findOne().click();
-    sleep(2000);
+    sleep(1000);
     while(!className("android.view.View").desc("本次答对题目数").exists()){
-        sleep(1000);
         dailyQuiz();
         sleep(2000);
     }
@@ -1380,21 +1379,14 @@ function doDailyQuiz()
         log("出现 领取奖励已达今日上限")
         sleep(1000);
         var ret = className("android.widget.Button").desc("返回").findOne();//bounds = (99,1165,533,1286)
-        sleep(2000);
+        sleep(1000);
         ret.click();
-        sleep(2000);
-        ret = className("android.view.View").depth(21).findOne();//bounds = (49,123,115,189)
-        sleep(2000);
-        click(ret.bounds().centerX(),ret.bounds().centerY());
-        sleep(2000);
-        back();//退到我的
-        sleep(2000);
+        sleep(1000);
+        back()//退到 我的
+        sleep(1000);
         toastLog('每日答题任务执行结束！d==(￣▽￣*)b')
         back();//退到 主页
-        sleep(2000);
-        //点击学习控件回到新闻首页
-        id("home_bottom_tab_button_work").findOne().click();
-        sleep(2000);
+        sleep(1000);
     }
     else{
         log("未出现 领取奖励已达今日上限")
@@ -1405,29 +1397,21 @@ function doDailyQuiz()
         sleep(1000);
         //再来一组
         while(!className("android.view.View").desc("本次答对题目数").exists()){
-            sleep(1000);
             dailyQuiz();
             sleep(2000);
         }
-        toastLog("等候5s加载页面...")
-        sleep(5000);
+        toastLog("等候3s加载页面...")
+        sleep(3000);
         //两组结束，直接回退
         var ret = className("android.widget.Button").desc("返回").findOne();//bounds = (99,1165,533,1286)
         sleep(1000);
         ret.click();
-        sleep(2000);
-        ret = className("android.view.View").depth(21).findOne();//bounds = (49,123,115,189)
-        sleep(2000);
-        click(ret.bounds().centerX(),ret.bounds().centerY());
-        sleep(2000);
-        back();//退到 我的
-        sleep(2000);
+        sleep(1000);
+        back()
+        sleep(1000);
         toastLog('每日答题任务执行结束！d==(￣▽￣*)b')
         back();//退到 主页
-        sleep(2000);
-        //点击学习控件回到新闻首页
-        id("home_bottom_tab_button_work").findOne().click();
-        sleep(2000);
+        sleep(1000);
     }
     
 }
@@ -1469,9 +1453,8 @@ function doWeeklyQuiz()
         sleep(500);
     }
     desc("未作答").findOnce().click();
-
+    sleep(1000);
     while(!className("android.view.View").desc("本次答对题目数").exists()){
-        sleep(1000);
         dailyQuiz();
         sleep(2000);
     }
@@ -1496,18 +1479,23 @@ function doWeeklyQuiz()
     else{
         log("未出现 领取奖励已达今日上限")
         sleep(1000);
-        var ret = className("android.widget.Button").desc("再来一组").findOne();
+        back();//回到每周答题列表
         sleep(1000);
-        click(ret.bounds().centerX(),ret.bounds().centerY());
+        while(desc("未作答").findOnce()==null)
+        {
+            toastLog("向下翻页...")
+            className("android.view.View").scrollable(true).findOne().scrollDown();
+            sleep(500);
+        }
+        desc("未作答").findOnce().click();
         sleep(1000);
         //再来一组
         while(!className("android.view.View").desc("本次答对题目数").exists()){
-            sleep(1000);
             dailyQuiz();
             sleep(2000);
         }
-        toastLog("等候5s加载页面...")
-        sleep(5000);
+        toastLog("等候3s加载页面...")
+        sleep(3000);
         //两组结束，直接回退
         var ret = className("android.widget.Button").desc("返回").findOne();//bounds = (99,1165,533,1286)
         sleep(1000);
@@ -1520,9 +1508,7 @@ function doWeeklyQuiz()
         toastLog('每周答题任务执行结束！d==(￣▽￣*)b')
         back();//退到 主页
         sleep(1000);
-
     }
-    
 }
 
 /**
@@ -1985,13 +1971,11 @@ function doSpecialQuiz()
         desc("继续答题").findOnce().click();
     else if(desc("开始答题").findOnce()!=null)
         desc("开始答题").findOnce().click();
-
+    sleep(1000);
     while(!className("android.view.View").desc("本次作答分数").exists()){
-        sleep(1000);
         specialQuiz();
         sleep(2000);
     }
-
     toastLog("等候3s加载页面...")
     sleep(3000);
 
@@ -2012,14 +1996,22 @@ function doSpecialQuiz()
     else{
         log("未出现 领取奖励已达今日上限")
         sleep(1000);
-        var ret = className("android.widget.Button").desc("再来一组").findOne();
+        back();
         sleep(1000);
-        click(ret.bounds().centerX(),ret.bounds().centerY());
-        sleep(1000);
+        while(desc("开始答题").findOnce()==null)
+        {
+            toastLog("向下翻页...")
+            className("android.view.View").scrollable(true).findOne().scrollDown();
+            sleep(500);
+        }
+        if(desc("继续答题").findOnce()!=null)
+            desc("继续答题").findOnce().click();
+        else if(desc("开始答题").findOnce()!=null)
+            desc("开始答题").findOnce().click();
         //再来一组
-        while(!className("android.view.View").desc("本次答对题目数").exists()){
-            sleep(1000);
-            dailyQuiz();
+        sleep(1000);
+        while(!className("android.view.View").desc("本次作答分数").exists()){
+            specialQuiz();
             sleep(2000);
         }
         toastLog("等候3s加载页面...")
