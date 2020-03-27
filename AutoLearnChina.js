@@ -246,7 +246,7 @@ function getTaskList() {
     toastLog("尝试获取任务列表...")
     //等待缓冲符号消失
     sleep(2000);
-    while(className("android.widget.ImageView").exists())
+    while(className("android.widget.ImageView").exists()||className("android.view.View").desc("--").exists())
     {
         sleep(1000);
         toastLog("等待加载...")
