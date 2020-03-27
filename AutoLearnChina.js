@@ -10,7 +10,7 @@ var form = {
 ui.layout(
     <vertical>
         <appbar>
-            <toolbar id="toolbar" title="强国助手 V2.0.2"/>
+            <toolbar id="toolbar" title="强国助手 V2.0.3"/>
         </appbar>
         <Switch id="autoService" text="无障碍服务" checked="{{auto.service != null}}" padding="8 8 8 8" textSize="15sp"/>
         <ScrollView>
@@ -76,7 +76,7 @@ ui.layout(
             <ScrollView>
             <vertical padding="18 8" h="auto">
                 <text text="答题任务选择：" textColor="#222222"/>
-                <checkbox id="daily_quiz" text="每日答题(预计花费3分钟)" />
+                <checkbox id="daily_quiz" text="每日答题(预计花费2分钟)" />
                 <checkbox id="weekly_quiz" text="每周答题(预计花费2分钟)" marginTop="5"/>
                 <checkbox id="special_quiz" text="专项答题(预计花费2分钟)" marginTop="5"/>
                 <checkbox id="challenge_quiz" text="挑战答题(预计花费2分钟)" marginTop="5"/>
@@ -119,7 +119,7 @@ ui.emitter.on("options_item_selected", (e, item)=>{
             app.startActivity('console');
             break;
         case "关于":
-            alert("关于", "强国助手 v2.0.2\n1.优化多选题时间和选择机制\n2.将答题模块调整至可选任务\n3.UI布局细微调整");
+            alert("关于", "强国助手 v2.0.3\n1.修改每日和每周答题模块的bug\n2.优化多选题的正则匹配机制");
             break;
     }
     e.consumed = true;
@@ -213,8 +213,10 @@ function main() {
             sleep(3000);
             toast("开始执行脚本！")
             getTaskList(); // 获取任务列表
-            doUnfinishedTask(); //执行当日未完成的任务
-            getTaskList(); // 重新获取任务列表,装载最新的阅读和视听时长剩余次数
+            var f = doUnfinishedTask(); //执行当日未完成的任务
+            if(f==1){//说明执行了必做任务，积分列表发生变化，需要刷新积分列表
+                getTaskList(); // 重新获取任务列表,装载最新的阅读和视听时长剩余次数
+            }
             doExtraTask();
             back();//回到手机主页
             sleep(2000);
@@ -287,44 +289,50 @@ function getTaskList() {
 
 
 function doUnfinishedTask(){
-    var flag = 0;//判断是否完成所有任务满分的标志
+    var flag = 0;//判断是否完成所有必做任务满分的标志
     var read_article_flag = 2 //判断阅读文章任务是否已完成，作为参数传入视听学习任务的new_vedio_list用于控件寻找
     for(i=0;i<taskInfoList.length;i++){
         var task = taskInfoList[i];
         // log(task);
         //如果当日获得积分<当日上限积分
         if(task.getIntegral < task.targetIntegral){
-            flag = 1;
             // log('未达成满分的任务有：'+task.title)
             if(task.title=='阅读文章'){
+                flag = 1;
                 rest_num = task.targetIntegral-task.getIntegral;
                 read_article_flag = 2;
                 readArticle(rest_num,8,false);//默认阅读8s，执行短时阅读任务
                 continue;
             }
             else if(task.title=='视听学习'){
+                flag = 1;
                 rest_num = task.targetIntegral-task.getIntegral;
                 learnVideo(rest_num,read_article_flag,8,false);//默认观看8s,执行短时视听任务
                 continue;
             }
             else if(task.title=='订阅'){
+                flag = 1;
                 rest_num = task.targetIntegral-task.getIntegral;
                 subscribe(rest_num);
                 continue;
             }
             else if(task.title=='分享'){
+                flag = 1;
                 share();
                 continue;
             }
             else if(task.title=='收藏'){
+                flag = 1;
                 collect();
                 continue;
             }
             else if(task.title=='发表观点'){
+                flag = 1;
                 comment();
                 continue;
             }
             else if(task.title=='本地频道'){
+                flag = 1;
                 localChannel();
                 continue;
             }
@@ -348,8 +356,9 @@ function doUnfinishedTask(){
     }
     if(!flag)
     {
-        toastLog('已完成当日所有脚本任务！d=====(￣▽￣*)b')
+        toastLog('已完成当日脚本必做任务！d=====(￣▽￣*)b')
     }
+    return flag;
 };
 
 function doExtraTask(){
@@ -955,18 +964,23 @@ function localChannel(){
 function dailyQuiz() {
     //多选题
     // sleep(1000);
+    //匹配题干或者提示的正则表达式,以中文标点符号结尾
+    var v = ".*[\u3002\uff1b\uff0c\uff1a\u201c\u201d\uff08\uff09\u3001\uff1f\u300a\u300b]"
+    // var v = [\u4e00-\u9fa5]
     if (descContains("多选题").exists()) {
         sleep(1000);
         log("多选");
-        
         //首先检查题目的空格与选项的个数是否相等，若相等则全选
-        var question = className("android.view.View").descMatches(".*。").findOnce()
+
+        var question = className("android.view.View").descMatches(v).findOnce()
         while(question==null){
             toastLog("重新搜索题干内容...")
             sleep(1000);
-            question = className("android.view.View").descMatches(".*。").findOnce()
+            question = className("android.view.View").descMatches(v).findOnce()
         }
+        log("question:"+question)
         questionText = question.desc()
+        log("questionText:"+questionText)
         var reg = /\S\s+(?=\S)/g;
         // toastLog(questionText.match(reg).length)
         var blankCnt = questionText.match(reg).length //空格个数
@@ -976,23 +990,40 @@ function dailyQuiz() {
                 child.child(0).child(1).click();
                 sleep(200);
             });
+            desc("查看提示").click();
+            sleep(500);
+            back();
+            sleep(1000);
+            var confirm = descContains("确定").findOnce();
+            if(confirm!=null){
+                confirm.click();
+                sleep(1000);
+            }
+            sleep(1000);
+            if (desc("下一题").exists()) {
+                desc("下一题").click();
+                sleep(500);
+            }
+            if (desc("完成").exists()) {
+                desc("完成").click();
+                sleep(500);
+            }
+            return;
         }
         //题目的空格与选项的个数不相等
         else{
             desc("查看提示").click()
             sleep(1000);
             // var hint = className("android.view.View").depth(21).indexInParent(1).drawingOrder(0).findOne().child(0).desc()
-            var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
-            back()
-            sleep(1000);
-            while(hint.desc()=="")
+            var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOnce();
+            while(hint==null||hint.desc()=="")
             {
                 toastLog("重新搜索提示...");
-                desc("查看提示").click();
-                sleep(1000);
-                hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
                 back()
                 sleep(1000);
+                desc("查看提示").click();
+                sleep(1000);
+                hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOnce();
             }
             log("提示："+hint.desc())
             back()
@@ -1040,12 +1071,11 @@ function dailyQuiz() {
             confirm.click();
             sleep(1000);
         }
-        sleep(500);
+        sleep(2000);
         if (desc("下一题").exists()) {
             desc("下一题").click();
             sleep(500);
         }
-        sleep(500);
         if (desc("完成").exists()) {
             desc("完成").click();
             sleep(500);
@@ -1058,18 +1088,18 @@ function dailyQuiz() {
         //点击提示按钮
         desc("查看提示").findOne().click()
         sleep(1000);
-        var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
-        back();
-        sleep(1000);
-        while(hint.desc()=="")
+        var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOnce();
+        while(hint==null||hint.desc()=="")
         {
+            back();
+            sleep(1000);
             toastLog("重新搜索提示...");
             desc("查看提示").click();
             sleep(1000);
-            hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
-            back();
-            sleep(1000);
+            hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOnce();
         }
+        back();
+        sleep(1000);
         var video_flag = 0;
         log("提示："+hint.desc())
         if(hint.desc()=="请观看视频"){
@@ -1293,14 +1323,13 @@ function dailyQuiz() {
         var confirm = descContains("确定").findOnce();
         if(confirm!=null){
             confirm.click();
-            sleep(2000);
+            sleep(1000);
         }
-        sleep(500);
+        sleep(2000);
         if (desc("下一题").exists()) {
             desc("下一题").click();
             sleep(500);
         }
-        sleep(500);
         if (desc("完成").exists()) {
             desc("完成").click();
             sleep(500);
@@ -1314,17 +1343,15 @@ function dailyQuiz() {
         desc("查看提示").click()
         sleep(1000);
         // var hint = className("android.view.View").depth(21).indexInParent(1).drawingOrder(0).findOne().child(0).desc()
-        var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
-        back()
-        sleep(1000);
-        while(hint.desc()=="")
+        var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOnce();
+        while(hint==null||hint.desc()=="")
         {
+            back()
+            sleep(1000);
             toastLog("重新搜索提示...");
             desc("查看提示").click();
             sleep(1000);
-            hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
-            back()
-            sleep(1000);
+            hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOnce();
         }
         log("提示："+hint.desc())
         back()
@@ -1403,15 +1430,14 @@ function dailyQuiz() {
         var confirm = descContains("确定").findOnce();
         if(confirm!=null){
             confirm.click();
-            sleep(2000);
+            sleep(1000);
         }
-        sleep(500);
+        sleep(2000);
         if (desc("下一题").exists()) {
             sleep(500);
             desc("下一题").click();
             sleep(500);
         }
-        sleep(500);
         if (desc("完成").exists()) {
             sleep(500);
             desc("完成").click();
@@ -1598,16 +1624,17 @@ function doWeeklyQuiz()
 function specialQuiz() {
     //多选题
     // sleep(1000);
+    var v = ".*[\u3002\uff1b\uff0c\uff1a\u201c\u201d\uff08\uff09\u3001\uff1f\u300a\u300b]"
     if (descContains("多选题").exists()) {
         sleep(1000);
         log("多选");
         
         //首先检查题目的空格与选项的个数是否相等，若相等则全选
-        var question = className("android.view.View").descMatches(".*。").findOnce()
+        var question = className("android.view.View").descMatches(v).findOnce()
         while(question==null){
             toastLog("重新搜索题干内容...")
             sleep(1000);
-            question = className("android.view.View").descMatches(".*。").findOnce()
+            question = className("android.view.View").descMatches(v).findOnce()
         }
         questionText = question.desc()
         var reg = /\S\s+(?=\S)/g;
@@ -1625,17 +1652,16 @@ function specialQuiz() {
             desc("查看提示").click()
             sleep(1000);
             // var hint = className("android.view.View").depth(21).indexInParent(1).drawingOrder(0).findOne().child(0).desc()
-            var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
-            back()
-            sleep(1000);
-            while(hint.desc()=="")
+            var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOnce();
+            
+            while(hint==null||hint.desc()=="")
             {
+                back()
+                sleep(1000);
                 toastLog("重新搜索提示...");
                 desc("查看提示").click();
                 sleep(1000);
-                hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
-                back()
-                sleep(1000);
+                hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOnce();
             }
             log("提示："+hint.desc())
             back()
@@ -1683,12 +1709,11 @@ function specialQuiz() {
             confirm.click();
             sleep(1000);
         }
-        sleep(500);
+        sleep(2000);
         if (desc("下一题").exists()) {
             desc("下一题").click();
             sleep(500);
         }
-        sleep(500);
         if (desc("完成").exists()) {
             desc("完成").click();
             sleep(500);
@@ -1702,19 +1727,19 @@ function specialQuiz() {
         desc("查看提示").findOne().click()
         sleep(1000);
         var hint = className("android.view.View").depth(21).indexInParent(0).drawingOrder(0).findOnce(2)
-        back();
-        sleep(1000);
-        while(hint.desc()=="")
+        while(hint==null||hint.desc()=="")
         {
+            back();
+            sleep(1000);
             toastLog("重新搜索提示...");
             desc("查看提示").click();
             sleep(1000);
             hint = className("android.view.View").depth(21).indexInParent(0).drawingOrder(0).findOnce(2)
-            back();
-            sleep(1000);
         }
         var video_flag = 0;
         log("提示："+hint.desc())
+        back();
+        sleep(1000);
         if(hint.desc()=="请观看视频"){
             video_flag = 1;
         }
@@ -1954,16 +1979,14 @@ function specialQuiz() {
         sleep(1000);
         // var hint = className("android.view.View").depth(21).indexInParent(1).drawingOrder(0).findOne().child(0).desc()
         var hint = className("android.view.View").depth(21).indexInParent(0).drawingOrder(0).findOnce(2);
-        back()
-        sleep(1000);
-        while(hint.desc()=="")
+        while(hint==null||hint.desc()=="")
         {
+            back()
+            sleep(1000);
             toastLog("重新搜索提示...");
             desc("查看提示").click();
             sleep(1000);
-            hint = className("android.view.View").depth(21).indexInParent(0).drawingOrder(0).findOnce(2)
-            back()
-            sleep(1000);
+            hint = className("android.view.View").depth(21).indexInParent(0).drawingOrder(0).findOnce(2);
         }
         log("提示："+hint.desc())
         back()
@@ -2036,7 +2059,7 @@ function specialQuiz() {
         desc("查看提示").click();
         sleep(500);
         back();
-        sleep(1000);
+        sleep(2000);
         if (desc("下一题").exists()) {
             desc("下一题").click();
             sleep(500);
