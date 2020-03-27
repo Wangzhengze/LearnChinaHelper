@@ -1,12 +1,16 @@
 "ui";
 var form = {
     isLongRead: false,
-    isLongWatch: false
+    isLongWatch: false,
+    isDailyQuiz:false,
+    isWeeklyQuiz:false,
+    isSpecialQuiz:false,
+    isChallengeQuiz:false
 }
 ui.layout(
     <vertical>
         <appbar>
-            <toolbar id="toolbar" title="强国助手 V2.0.1"/>
+            <toolbar id="toolbar" title="强国助手 V2.0.2"/>
         </appbar>
         <Switch id="autoService" text="无障碍服务" checked="{{auto.service != null}}" padding="8 8 8 8" textSize="15sp"/>
         <ScrollView>
@@ -40,8 +44,8 @@ ui.layout(
             cardElevation="1dp" gravity="center_vertical">
             <ScrollView>
             <vertical padding="18 8" h="auto">
-                <text text="当前版本强国助手支持的功能包括：(以下任务预计花费15分钟)" textColor="#222222" textSize="14sp"/>
-                <text text="阅读文章、视听学习、收藏、分享、订阅、评论、本地频道、每日答题、每周答题、专项答题、挑战答题" textColor="#999999" textSize="14sp"/>
+                <text text="当前版本强国助手支持的必选任务包括：(以下任务预计花费7分钟)" textColor="#222222" textSize="14sp"/>
+                <text text="阅读文章、视听学习、收藏、分享、订阅、评论、本地频道" textColor="#999999" textSize="14sp"/>
             </vertical>
             </ScrollView>
             <View bg="#4caf50" h="*" w="10"/>
@@ -55,15 +59,14 @@ ui.layout(
             </ScrollView>
             <View bg="#4caf50" h="*" w="10"/>
         </card>
+
         <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
             cardElevation="1dp" gravity="center_vertical">
             <ScrollView>
             <vertical padding="18 8" h="auto">
-                <text text="是否执行文章学习时长任务：(预计花费12分钟)" textColor="#222222"/>
-                <radiogroup id="long_read">
-                        <radio id="yes_read"  text="是"></radio>
-                        <radio  id="no_read" text="否" checked = "true"></radio>
-                </radiogroup>
+                <text text="长时任务选择：" textColor="#222222"/>
+                <checkbox id="yes_read" text="文章学习时长任务(预计花费12分钟)" />
+                <checkbox id="yes_watch" text="视听学习时长任务(建议在wifi环境下执行，预计花费18分钟)" marginTop="5"/>
             </vertical>
             </ScrollView>
             <View bg="#2196f3" h="*" w="10"/>
@@ -72,15 +75,17 @@ ui.layout(
             cardElevation="1dp" gravity="center_vertical">
             <ScrollView>
             <vertical padding="18 8" h="auto">
-                <text text="是否执行视听学习时长任务：(建议在wifi环境下执行，预计花费18分钟)" textColor="#222222"/>
-                <radiogroup id="long_watch">
-                        <radio id="yes_watch"  text="是"></radio>
-                        <radio id="no_watch" text="否" checked = "true"></radio>
-                </radiogroup>
+                <text text="答题任务选择：" textColor="#222222"/>
+                <checkbox id="daily_quiz" text="每日答题(预计花费3分钟)" />
+                <checkbox id="weekly_quiz" text="每周答题(预计花费2分钟)" marginTop="5"/>
+                <checkbox id="special_quiz" text="专项答题(预计花费2分钟)" marginTop="5"/>
+                <checkbox id="challenge_quiz" text="挑战答题(预计花费2分钟)" marginTop="5"/>
             </vertical>
             </ScrollView>
             <View bg="#2196f3" h="*" w="10"/>
         </card>
+        
+
         <linear gravity="center">
             <button id="start" text="开始运行" style="Widget.AppCompat.Button.Colored" w="auto"/>
             <button id="stop" text="停止运行"  w="auto"/>
@@ -114,33 +119,49 @@ ui.emitter.on("options_item_selected", (e, item)=>{
             app.startActivity('console');
             break;
         case "关于":
-            alert("关于", "强国助手 v2.0.1\n1.优化答题模块的速度\n2.修复每周答题第一次没得满分后重做失败的bug\n3.修复专项答题第一次没得满分后重做失败的bug\n");
+            alert("关于", "强国助手 v2.0.2\n1.优化多选题时间和选择机制\n2.将答题模块调整至可选任务\n3.UI布局细微调整");
             break;
     }
     e.consumed = true;
 });
 activity.setSupportActionBar(ui.toolbar);
-
 ui.yes_read.on("check",function(check){
-    if(check){
+    if(check)
         form.isLongRead= true;
-    }
-});
-ui.no_read.on("check",function(check){
-    if(check){
+    else
         form.isLongRead= false;
-    }
 });
 ui.yes_watch.on("check",function(check){
-    if(check){
+    if(check)
         form.isLongWatch= true;
-    }
-});
-ui.no_watch.on("check",function(check){
-    if(check){
+    else
         form.isLongWatch= false;
-    }
 });
+ui.daily_quiz.on("check",function(check){
+    if(check)
+        form.isDailyQuiz= true;
+    else
+        form.isDailyQuiz= false;
+});
+ui.weekly_quiz.on("check",function(check){
+    if(check)
+        form.isWeeklyQuiz= true;
+    else    
+        form.isWeeklyQuiz= false;
+});
+ui.special_quiz.on("check",function(check){
+    if(check)
+        form.isSpecialQuiz= true;
+    else
+        form.isSpecialQuiz= false
+});
+ui.challenge_quiz.on("check",function(check){
+    if(check)
+        form.isChallengeQuiz= true;
+    else
+        form.isChallengeQuiz= false;
+});
+
 ui.autoService.on("check", function(checked) {
     // 用户勾选无障碍服务的选项时，跳转到页面让用户去开启
     if(checked && auto.service == null) {
@@ -307,22 +328,22 @@ function doUnfinishedTask(){
                 localChannel();
                 continue;
             }
-            else if(task.title=='每日答题'){
-                doDailyQuiz();
-                continue;
-            }
-            else if(task.title=='每周答题'){
-                doWeeklyQuiz();
-                continue;
-            }
-            else if(task.title=='专项答题'){
-                doSpecialQuiz();
-                continue;
-            }
-            else if(task.title=='挑战答题'){
-                challengeQuiz();
-                continue;
-            }
+            // else if(task.title=='每日答题'){
+            //     doDailyQuiz();
+            //     continue;
+            // }
+            // else if(task.title=='每周答题'){
+            //     doWeeklyQuiz();
+            //     continue;
+            // }
+            // else if(task.title=='专项答题'){
+            //     doSpecialQuiz();
+            //     continue;
+            // }
+            // else if(task.title=='挑战答题'){
+            //     challengeQuiz();
+            //     continue;
+            // }
         }
     }
     if(!flag)
@@ -335,6 +356,42 @@ function doExtraTask(){
     toastLog('执行额外脚本任务....')
     sleep(1000);
     var read_article_flag = 2;
+    if(form.isDailyQuiz)
+    {
+        for(i=0;i<taskInfoList.length;i++){
+            var task = taskInfoList[i];
+            if(task.getIntegral < task.targetIntegral&&task.title=='每日答题'){
+                doDailyQuiz();
+            }
+        }
+    }
+    if(form.isWeeklyQuiz)
+    {
+        for(i=0;i<taskInfoList.length;i++){
+            var task = taskInfoList[i];
+            if(task.getIntegral < task.targetIntegral&&task.title=='每周答题'){
+                doWeeklyQuiz();
+            }
+        }
+    }
+    if(form.isSpecialQuiz)
+    {
+        for(i=0;i<taskInfoList.length;i++){
+            var task = taskInfoList[i];
+            if(task.getIntegral < task.targetIntegral&&task.title=='专项答题'){
+                doSpecialQuiz();
+            }
+        }
+    }
+    if(form.isChallengeQuiz)
+    {
+        for(i=0;i<taskInfoList.length;i++){
+            var task = taskInfoList[i];
+            if(task.getIntegral < task.targetIntegral&&task.title=='挑战答题'){
+                challengeQuiz();
+            }
+        }
+    }
     if(form.isLongRead)
     {
         read_article_flag = 2;
@@ -361,7 +418,6 @@ function doExtraTask(){
                 learnVideo(rest_num,read_article_flag,185,true);
             }
         }
-        
     }
     toastLog('额外任务执行完成！d=====(￣▽￣*)b')
 }
@@ -902,57 +958,81 @@ function dailyQuiz() {
     if (descContains("多选题").exists()) {
         sleep(1000);
         log("多选");
-        desc("查看提示").click()
-        sleep(1000);
-        // var hint = className("android.view.View").depth(21).indexInParent(1).drawingOrder(0).findOne().child(0).desc()
-        var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
-        while(hint.desc()=="")
-        {
-            toastLog("重新搜索提示...");
+        
+        //首先检查题目的空格与选项的个数是否相等，若相等则全选
+        var question = className("android.view.View").descMatches(".*。").findOnce()
+        while(question==null){
+            toastLog("重新搜索题干内容...")
+            sleep(1000);
+            question = className("android.view.View").descMatches(".*。").findOnce()
+        }
+        questionText = question.desc()
+        var reg = /\S\s+(?=\S)/g;
+        // toastLog(questionText.match(reg).length)
+        var blankCnt = questionText.match(reg).length //空格个数
+        if (className("android.widget.ListView").findOnce().children().length==blankCnt){
+            toastLog("匹配到题目空格与选项相等，直接全选...")
+            className("android.widget.ListView").findOnce().children().forEach(function(child) {
+                child.child(0).child(1).click();
+                sleep(200);
+            });
+        }
+        //题目的空格与选项的个数不相等
+        else{
+            desc("查看提示").click()
+            sleep(1000);
+            // var hint = className("android.view.View").depth(21).indexInParent(1).drawingOrder(0).findOne().child(0).desc()
+            var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
             back()
             sleep(1000);
-            desc("查看提示").click();
-            sleep(1000);
-            hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
-        }
-        log("提示："+hint.desc())
-        back()
-        sleep(1000)
-        // let similarities = []
-        var final_answer= ""
-        var options = [];
-        var match_options= [];
-        className("android.widget.ListView").findOne().children().forEach(function(child) {
-            var option = child.child(0).child(2).desc();
-            log("options:"+option)
-            options.push(option)
-            var start = hint.desc().indexOf(option);//获得option字符串在hint.desc()字符串中的开始位置
-            if(start!=-1){//找到了
-                match_options.push(option);
+            while(hint.desc()=="")
+            {
+                toastLog("重新搜索提示...");
+                desc("查看提示").click();
+                sleep(1000);
+                hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
+                back()
+                sleep(1000);
             }
-        });
-        log("match_options:"+match_options)
-        //找到多个匹配选项
-        if(match_options.length>0)
-        {
-            log("找到多个匹配选项")
-            //逐个点击正确答案
-            className("android.widget.ListView").findOne().children().forEach(child => {
-                var answer = child.child(0).child(2).desc();
-                sleep(1000)
-                for(var i=0;i<match_options.length;i++)
-                {
-                    if (answer == match_options[i]) {
-                        child.child(0).child(1).click();
-                        sleep(500);
-                    }
+            log("提示："+hint.desc())
+            back()
+            sleep(1000)
+            // let similarities = []
+            var final_answer= ""
+            var options = [];
+            var match_options= [];
+            className("android.widget.ListView").findOne().children().forEach(function(child) {
+                var option = child.child(0).child(2).desc();
+                log("options:"+option)
+                options.push(option)
+                var start = hint.desc().indexOf(option);//获得option字符串在hint.desc()字符串中的开始位置
+                if(start!=-1){//找到了
+                    match_options.push(option);
                 }
-                
             });
+            log("match_options:"+match_options)
+            //找到多个匹配选项
+            if(match_options.length>0)
+            {
+                log("找到多个匹配选项")
+                //逐个点击正确答案
+                className("android.widget.ListView").findOne().children().forEach(child => {
+                    var answer = child.child(0).child(2).desc();
+                    sleep(1000)
+                    for(var i=0;i<match_options.length;i++)
+                    {
+                        if (answer == match_options[i]) {
+                            child.child(0).child(1).click();
+                            sleep(200);
+                        }
+                    }
+                    
+                });
+            }
         }
         //再点击查看提示来激活确定的控件，不然找不到这个控件
         desc("查看提示").click();
-        sleep(1000);
+        sleep(500);
         back();
         sleep(1000);
         var confirm = descContains("确定").findOnce();
@@ -978,7 +1058,6 @@ function dailyQuiz() {
         //点击提示按钮
         desc("查看提示").findOne().click()
         sleep(1000);
-        
         var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
         back();
         sleep(1000);
@@ -1236,14 +1315,16 @@ function dailyQuiz() {
         sleep(1000);
         // var hint = className("android.view.View").depth(21).indexInParent(1).drawingOrder(0).findOne().child(0).desc()
         var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
+        back()
+        sleep(1000);
         while(hint.desc()=="")
         {
             toastLog("重新搜索提示...");
-            back()
-            sleep(1000);
             desc("查看提示").click();
             sleep(1000);
             hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
+            back()
+            sleep(1000);
         }
         log("提示："+hint.desc())
         back()
@@ -1520,60 +1601,94 @@ function specialQuiz() {
     if (descContains("多选题").exists()) {
         sleep(1000);
         log("多选");
-        desc("查看提示").click()
-        sleep(1000);
-        var hint = className("android.view.View").depth(21).indexInParent(0).drawingOrder(0).findOnce(2)
-        while(hint.desc()=="")
-        {
-            toastLog("重新搜索提示...");
-            back()
+        
+        //首先检查题目的空格与选项的个数是否相等，若相等则全选
+        var question = className("android.view.View").descMatches(".*。").findOnce()
+        while(question==null){
+            toastLog("重新搜索题干内容...")
             sleep(1000);
-            desc("查看提示").click();
-            sleep(1000);
-            hint = className("android.view.View").depth(21).indexInParent(0).drawingOrder(0).findOnce(2)
+            question = className("android.view.View").descMatches(".*。").findOnce()
         }
-        log("提示："+hint.desc())
-        back()
-        sleep(1000)
-        var final_answer= ""
-        var options = [];
-        var match_options= [];
-        className("android.widget.ListView").findOne().children().forEach(function(child) {
-            var option = child.child(0).child(2).desc();
-            log("options:"+option)
-            options.push(option)
-            var start = hint.desc().indexOf(option);//获得option字符串在hint.desc()字符串中的开始位置
-            if(start!=-1){//找到了
-                match_options.push(option);
-            }
-        });
-        log("match_options:"+match_options)
-        //找到多个匹配选项
-        if(match_options.length>0)
-        {
-            log("找到多个匹配选项")
-            //逐个点击正确答案
-            className("android.widget.ListView").findOne().children().forEach(child => {
-                var answer = child.child(0).child(2).desc();
-                sleep(1000)
-                for(var i=0;i<match_options.length;i++)
-                {
-                    if (answer == match_options[i]) {
-                        child.child(0).child(1).click();
-                        sleep(500);
-                    }
-                }
-                
+        questionText = question.desc()
+        var reg = /\S\s+(?=\S)/g;
+        // toastLog(questionText.match(reg).length)
+        var blankCnt = questionText.match(reg).length //空格个数
+        if (className("android.widget.ListView").findOnce().children().length==blankCnt){
+            toastLog("匹配到题目空格与选项相等，直接全选...")
+            className("android.widget.ListView").findOnce().children().forEach(function(child) {
+                child.child(0).child(1).click();
+                sleep(200);
             });
         }
+        //题目的空格与选项的个数不相等
+        else{
+            desc("查看提示").click()
+            sleep(1000);
+            // var hint = className("android.view.View").depth(21).indexInParent(1).drawingOrder(0).findOne().child(0).desc()
+            var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
+            back()
+            sleep(1000);
+            while(hint.desc()=="")
+            {
+                toastLog("重新搜索提示...");
+                desc("查看提示").click();
+                sleep(1000);
+                hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOne();
+                back()
+                sleep(1000);
+            }
+            log("提示："+hint.desc())
+            back()
+            sleep(1000)
+            // let similarities = []
+            var final_answer= ""
+            var options = [];
+            var match_options= [];
+            className("android.widget.ListView").findOne().children().forEach(function(child) {
+                var option = child.child(0).child(2).desc();
+                log("options:"+option)
+                options.push(option)
+                var start = hint.desc().indexOf(option);//获得option字符串在hint.desc()字符串中的开始位置
+                if(start!=-1){//找到了
+                    match_options.push(option);
+                }
+            });
+            log("match_options:"+match_options)
+            //找到多个匹配选项
+            if(match_options.length>0)
+            {
+                log("找到多个匹配选项")
+                //逐个点击正确答案
+                className("android.widget.ListView").findOne().children().forEach(child => {
+                    var answer = child.child(0).child(2).desc();
+                    sleep(1000)
+                    for(var i=0;i<match_options.length;i++)
+                    {
+                        if (answer == match_options[i]) {
+                            child.child(0).child(1).click();
+                            sleep(200);
+                        }
+                    }
+                    
+                });
+            }
+        }
+        //再点击查看提示来激活确定的控件，不然找不到这个控件
         desc("查看提示").click();
         sleep(500);
         back();
         sleep(1000);
+        var confirm = descContains("确定").findOnce();
+        if(confirm!=null){
+            confirm.click();
+            sleep(1000);
+        }
+        sleep(500);
         if (desc("下一题").exists()) {
             desc("下一题").click();
             sleep(500);
         }
+        sleep(500);
         if (desc("完成").exists()) {
             desc("完成").click();
             sleep(500);
@@ -1586,7 +1701,6 @@ function specialQuiz() {
         //点击提示按钮
         desc("查看提示").findOne().click()
         sleep(1000);
-        
         var hint = className("android.view.View").depth(21).indexInParent(0).drawingOrder(0).findOnce(2)
         back();
         sleep(1000);
@@ -1840,14 +1954,16 @@ function specialQuiz() {
         sleep(1000);
         // var hint = className("android.view.View").depth(21).indexInParent(1).drawingOrder(0).findOne().child(0).desc()
         var hint = className("android.view.View").depth(21).indexInParent(0).drawingOrder(0).findOnce(2);
+        back()
+        sleep(1000);
         while(hint.desc()=="")
         {
             toastLog("重新搜索提示...");
-            back()
-            sleep(1000);
             desc("查看提示").click();
             sleep(1000);
             hint = className("android.view.View").depth(21).indexInParent(0).drawingOrder(0).findOnce(2)
+            back()
+            sleep(1000);
         }
         log("提示："+hint.desc())
         back()
