@@ -10,7 +10,7 @@ var form = {
 ui.layout(
     <vertical>
         <appbar>
-            <toolbar id="toolbar" title="强国助手 V2.0.4"/>
+            <toolbar id="toolbar" title="强国助手 V2.0.5"/>
         </appbar>
         <Switch id="autoService" text="无障碍服务" checked="{{auto.service != null}}" padding="8 8 8 8" textSize="15sp"/>
         <ScrollView>
@@ -119,7 +119,7 @@ ui.emitter.on("options_item_selected", (e, item)=>{
             app.startActivity('console');
             break;
         case "关于":
-            alert("关于", "强国助手 v2.0.4\n1.增加时长任务防止陷入死循环的检测机制\n2.优化填空题答案为空时的解决方案");
+            alert("关于", "强国助手 v2.0.5\n1.优化订阅任务中所有订阅号已经订阅完的边界情况");
             break;
     }
     e.consumed = true;
@@ -2511,11 +2511,12 @@ function subscribe(num){
                         subscribe_icon.click();
                         sleep(2000);
                     }
-                    else if(item.className()=='android.widget.LinearLayout')//遍历到底了
-                    {
-                        bottom_flag = 1;
-                        return;
-                    }
+                }
+                else if(item.className()=='android.widget.LinearLayout')//遍历到底了
+                {
+                    toastLog("检测到已经遍历到底...");
+                    bottom_flag = 1;
+                    return;
                 }
             });
             if(bottom_flag)
@@ -2553,7 +2554,6 @@ function subscribe(num){
                 else if(item.className()=='android.widget.LinearLayout')//遍历到底了
                 {
                     bottom_flag = 1;
-                    return;
                 }
             });
             if(bottom_flag)
@@ -2589,11 +2589,12 @@ function subscribe(num){
                         subscribe_icon.click();
                         sleep(2000);
                     }
-                    else if(item.className()=='android.widget.LinearLayout')//遍历到底了
-                    {
-                        bottom_flag = 1;
-                        return;
-                    }
+                }
+                else if(item.className()=='android.widget.LinearLayout')//遍历到底了
+                {
+                    toastLog("检测到强国号已经遍历到底...");
+                    bottom_flag = 1;
+                    return;
                 }
             });
             if(bottom_flag)
@@ -2604,6 +2605,50 @@ function subscribe(num){
             accounts_pool.scrollDown();
             sleep(2000);
             accounts_pool = className("android.widget.ListView").depth(13).findOne();
+        }
+    }
+    //如果强国号订阅完了，继续找学习平台栏目的订阅号
+    if(bottom_flag==1)
+    {
+        toastLog("进入学习平台继续寻找...");
+        className("android.widget.TextView").text("学习平台").findOne().parent().click();
+        sleep(3000);
+        accounts_pool = className("android.widget.ListView").depth(13).findOnce(1);
+        var bottom_flag = 0;
+        while(accounts_pool!=null&&num>0)
+        {
+            sleep(1000);
+            var frameLayoutList = accounts_pool.children();
+            frameLayoutList.forEach(function(item,index){
+                if(item.className()=='android.widget.FrameLayout')
+                {
+                    var account_name = item.find(className("android.widget.TextView"));
+                    if(num>0&&subscribed_accounts.indexOf(account_name[0].text())==-1)//说明数组中不存在这个元素,则订阅他
+                    {
+                        num--;
+                        subscribed_accounts.push(account_name[0].text());
+                        subscribe_icon = item.find(className("android.widget.LinearLayout"))[1];
+                        // log("subscribe_icon:"+subscribe_icon)
+                        toastLog("正在订阅...");
+                        subscribe_icon.click();
+                        sleep(2000);
+                    }
+                }
+                else if(item.className()=='android.widget.LinearLayout')//遍历到底了
+                {
+                    toastLog("检测到学习平台已经遍历到底...");
+                    bottom_flag = 1;
+                    return;
+                }
+            });
+            if(bottom_flag)
+            {
+                toastLog("学习平台都已经订阅完啦...");
+                break;
+            }
+            accounts_pool.scrollDown();
+            sleep(2000);
+            accounts_pool = className("android.widget.ListView").depth(13).findOnce(1);
         }
     }
     toastLog("订阅任务执行结束！d==(￣▽￣*)b");
