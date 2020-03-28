@@ -1,6 +1,6 @@
 # 《强国助手》说明文档
 
-点击下载当前最新版本：[V2.0.4](https://github.com/XiangyuTang/LearnChinaHelper/releases/download/V2.0.4/v2.0.4.apk)
+点击下载当前最新版本：[V2.0.5](https://github.com/XiangyuTang/LearnChinaHelper/releases/download/V2.0.5/v2.0.5.apk)
 
 ## 免责声明
 
@@ -80,6 +80,7 @@ Readme.md —— 《强国助手》说明文档
 
 ### 强国助手APP更新日志
 
+- V2.0.5：优化订阅任务中所有订阅号已经订阅完的边界情况
 - V2.0.4：增加长时任务防止陷入死循环的检测机制，优化填空题答案为空时的解决方案
 - V2.0.3：修改每日和每周答题模块的bug，优化多选题的正则匹配机制
 - V2.0.2：优化多选题时间和选择机制，将答题模块调整至可选任务，对UI布局进行细微调整
