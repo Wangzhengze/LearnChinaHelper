@@ -10,7 +10,7 @@ var form = {
 ui.layout(
     <vertical>
         <appbar>
-            <toolbar id="toolbar" title="强国助手 V2.0.3"/>
+            <toolbar id="toolbar" title="强国助手 V2.0.4"/>
         </appbar>
         <Switch id="autoService" text="无障碍服务" checked="{{auto.service != null}}" padding="8 8 8 8" textSize="15sp"/>
         <ScrollView>
@@ -119,7 +119,7 @@ ui.emitter.on("options_item_selected", (e, item)=>{
             app.startActivity('console');
             break;
         case "关于":
-            alert("关于", "强国助手 v2.0.3\n1.修改每日和每周答题模块的bug\n2.优化多选题的正则匹配机制");
+            alert("关于", "强国助手 v2.0.4\n1.增加时长任务防止陷入死循环的检测机制\n2.优化填空题答案为空时的解决方案");
             break;
     }
     e.consumed = true;
@@ -535,6 +535,7 @@ function readArticle(num,time,isLong){
 function readArticle1(num,time,isLong){
     sleep(1000);
     toastLog('开始执行阅读时长任务...')
+    var stop_key = 0;
     //点击学习控件
     id("home_bottom_tab_button_work").findOne().click();
     sleep(1500);
@@ -578,6 +579,17 @@ function readArticle1(num,time,isLong){
                         {
                             num--;
                             toastLog("进行模拟阅读"+time+"s...剩余阅读篇数："+num);
+                            if(time>120&&num==0)
+                            {
+                                stop_key++;
+                                //如果剩余阅读0次后连续超过了2次，第3次直接退出
+                                if(stop_key==3){
+                                    back();
+                                    toastLog('检测到陷入连续循环风险，阅读时长学习任务执行结束！')
+                                    sleep(2000);
+                                    return;
+                                }
+                            }
                             // waitForPackage("cn.xuexi.android");
                             for(var t=1;t<=time;t++)
                             {
@@ -643,6 +655,7 @@ function readArticle1(num,time,isLong){
  */
 function learnVideo(num,read_article_flag,time,isLong){
     log("read_article_flag:"+read_article_flag);
+    var stop_key = 0;//防止长时视听最后陷入死循环的检测机制
     sleep(1000);
     toastLog('开始执行视听学习任务...');
     //进入电视台频道
@@ -680,6 +693,17 @@ function learnVideo(num,read_article_flag,time,isLong){
                                 sleep(1000);
                             }
                             toastLog("进行模拟观看"+time+"s...剩余视听："+num+"次");
+                            if(time>180&&num==0)
+                            {
+                                stop_key++;
+                                //如果剩余视听0次后连续超过了2次，第3次直接退出
+                                if(stop_key==3){
+                                    back();
+                                    toastLog('检测到陷入连续循环风险，视听时长学习任务执行结束！')
+                                    sleep(2000);
+                                    return;
+                                }
+                            }
                             for(var t=1;t<=time;t++)
                             {
                                 sleep(1000);
@@ -715,6 +739,7 @@ function learnVideo(num,read_article_flag,time,isLong){
                                 {
                                     num++;
                                     toastLog("检测积分未发生变化...向下翻页并重置剩余视听次数："+num);
+                                    
                                 }
                                 new_vedio_list.scrollDown();
                             }
@@ -1168,6 +1193,9 @@ function dailyQuiz() {
                 if(start!=-1){//说明找到了
                     start = start+pre_chars.length;
                     result = hint.desc().substring(start,start+blank.len);
+                    if(result==""){
+                        result = hint.desc().substring(0,blank.len);
+                    }
                     log("result:"+result);
                     //填上result
                     content_view.child(blank.index).setText(result);
@@ -1180,6 +1208,9 @@ function dailyQuiz() {
                     if(start!=-1){//说明找到了
                         start = start+pre_chars.length;
                         result = hint.desc().substring(start,start+blank.len);
+                        if(result==""){
+                            result = hint.desc().substring(0,blank.len);
+                        }
                         log("result:"+result);
                         //填上result
                         content_view.child(blank.index).setText(result);
@@ -1192,6 +1223,9 @@ function dailyQuiz() {
                         if(start!=-1){//说明找到了
                             start = start+pre_chars.length;
                             result = hint.desc().substring(start,start+blank.len);
+                            if(result==""){
+                                result = hint.desc().substring(0,blank.len);
+                            }
                             log("result:"+result);
                             //填上result
                             content_view.child(blank.index).setText(result);
@@ -1201,6 +1235,9 @@ function dailyQuiz() {
                         else{//直接选提示的前几个字符作为答案
                             log("前缀匹配未找到符合条件的结果...")
                             result = hint.desc().substring(0,blank.len);
+                            if(result==""){
+                                result = hint.desc().substring(0,blank.len);
+                            }
                             log("result:"+result);
                             content_view.child(blank.index).setText(result);
                             sleep(500);
@@ -1215,6 +1252,9 @@ function dailyQuiz() {
                     if(start!=-1){//说明找到了
                         start = start+pre_chars.length;
                         result = hint.desc().substring(start,start+blank.len);
+                        if(result==""){
+                            result = hint.desc().substring(0,blank.len);
+                        }
                         log("result:"+result);
                         //填上result
                         content_view.child(blank.index).setText(result);
@@ -1227,6 +1267,9 @@ function dailyQuiz() {
                         if(start!=-1){//说明找到了
                             start = start+pre_chars.length;
                             result = hint.desc().substring(start,start+blank.len);
+                            if(result==""){
+                                result = hint.desc().substring(0,blank.len);
+                            }
                             log("result:"+result);
                             //填上result
                             content_view.child(blank.index).setText(result);
@@ -1249,6 +1292,9 @@ function dailyQuiz() {
                 if(start!=-1){//说明找到了
                     start = start+pre_chars.length;
                     result = hint.desc().substring(start,start+blank.len);
+                    if(result==""){
+                        result = hint.desc().substring(0,blank.len);
+                    }
                     log("result:"+result);
                     //填上result
                     content_view.child(blank.index).setText(result);
@@ -1274,6 +1320,9 @@ function dailyQuiz() {
                     if(start!=-1){//说明找到了
                         start = start-post_chars.length;
                         result = hint.desc().substring(start,start+blank.len);
+                        if(result==""){
+                            result = hint.desc().substring(0,blank.len);
+                        }
                         log("result:"+result);
                         //填上result
                         content_view.child(blank.index).setText(result);
@@ -1287,6 +1336,9 @@ function dailyQuiz() {
                         if(start!=-1){//说明找到了
                             start = start-post_chars.length;
                             result = hint.desc().substring(start,start+blank.len);
+                            if(result==""){
+                                result = hint.desc().substring(0,blank.len);
+                            }
                             log("result:"+result);
                             //填上result
                             content_view.child(blank.index).setText(result);
@@ -1300,6 +1352,9 @@ function dailyQuiz() {
                             if(start!=-1){//说明找到了
                                 start = start-post_chars.length;
                                 result = hint.desc().substring(start,start+blank.len);
+                                if(result==""){
+                                    result = hint.desc().substring(0,blank.len);
+                                }
                                 log("result:"+result);
                                 //填上result
                                 content_view.child(blank.index).setText(result);
@@ -1806,6 +1861,9 @@ function specialQuiz() {
                 if(start!=-1){//说明找到了
                     start = start+pre_chars.length;
                     result = hint.desc().substring(start,start+blank.len);
+                    if(result==""){
+                        result = hint.desc().substring(0,blank.len);
+                    }
                     log("result:"+result);
                     //填上result
                     content_view.child(blank.index).setText(result);
@@ -1818,6 +1876,9 @@ function specialQuiz() {
                     if(start!=-1){//说明找到了
                         start = start+pre_chars.length;
                         result = hint.desc().substring(start,start+blank.len);
+                        if(result==""){
+                            result = hint.desc().substring(0,blank.len);
+                        }
                         log("result:"+result);
                         //填上result
                         content_view.child(blank.index).setText(result);
@@ -1830,6 +1891,9 @@ function specialQuiz() {
                         if(start!=-1){//说明找到了
                             start = start+pre_chars.length;
                             result = hint.desc().substring(start,start+blank.len);
+                            if(result==""){
+                                result = hint.desc().substring(0,blank.len);
+                            }
                             log("result:"+result);
                             //填上result
                             content_view.child(blank.index).setText(result);
@@ -1853,6 +1917,9 @@ function specialQuiz() {
                     if(start!=-1){//说明找到了
                         start = start+pre_chars.length;
                         result = hint.desc().substring(start,start+blank.len);
+                        if(result==""){
+                            result = hint.desc().substring(0,blank.len);
+                        }
                         log("result:"+result);
                         //填上result
                         content_view.child(blank.index).setText(result);
@@ -1865,6 +1932,9 @@ function specialQuiz() {
                         if(start!=-1){//说明找到了
                             start = start+pre_chars.length;
                             result = hint.desc().substring(start,start+blank.len);
+                            if(result==""){
+                                result = hint.desc().substring(0,blank.len);
+                            }
                             log("result:"+result);
                             //填上result
                             content_view.child(blank.index).setText(result);
@@ -1887,6 +1957,9 @@ function specialQuiz() {
                 if(start!=-1){//说明找到了
                     start = start+pre_chars.length;
                     result = hint.desc().substring(start,start+blank.len);
+                    if(result==""){
+                        result = hint.desc().substring(0,blank.len);
+                    }
                     log("result:"+result);
                     //填上result
                     content_view.child(blank.index).setText(result);
@@ -1912,6 +1985,9 @@ function specialQuiz() {
                     if(start!=-1){//说明找到了
                         start = start-post_chars.length;
                         result = hint.desc().substring(start,start+blank.len);
+                        if(result==""){
+                            result = hint.desc().substring(0,blank.len);
+                        }
                         log("result:"+result);
                         //填上result
                         content_view.child(blank.index).setText(result);
@@ -1925,6 +2001,9 @@ function specialQuiz() {
                         if(start!=-1){//说明找到了
                             start = start-post_chars.length;
                             result = hint.desc().substring(start,start+blank.len);
+                            if(result==""){
+                                result = hint.desc().substring(0,blank.len);
+                            }
                             log("result:"+result);
                             //填上result
                             content_view.child(blank.index).setText(result);
@@ -1938,6 +2017,9 @@ function specialQuiz() {
                             if(start!=-1){//说明找到了
                                 start = start-post_chars.length;
                                 result = hint.desc().substring(start,start+blank.len);
+                                if(result==""){
+                                    result = hint.desc().substring(0,blank.len);
+                                }
                                 log("result:"+result);
                                 //填上result
                                 content_view.child(blank.index).setText(result);
