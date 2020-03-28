@@ -10,7 +10,7 @@ var form = {
 ui.layout(
     <vertical>
         <appbar>
-            <toolbar id="toolbar" title="强国助手 V2.0.5"/>
+            <toolbar id="toolbar" title="强国助手 V2.0.6"/>
         </appbar>
         <Switch id="autoService" text="无障碍服务" checked="{{auto.service != null}}" padding="8 8 8 8" textSize="15sp"/>
         <ScrollView>
@@ -119,7 +119,7 @@ ui.emitter.on("options_item_selected", (e, item)=>{
             app.startActivity('console');
             break;
         case "关于":
-            alert("关于", "强国助手 v2.0.5\n1.优化订阅任务中所有订阅号已经订阅完的边界情况");
+            alert("关于", "强国助手 v2.0.6\n1.优化每周答题已经无题可答的边界情况\n2.优化专项答题已经无题可答的边界情况");
             break;
     }
     e.consumed = true;
@@ -1610,9 +1610,21 @@ function doWeeklyQuiz()
     sleep(2000);
     while(desc("未作答").findOnce()==null)
     {
+        if(className("android.view.View").desc("您已经看到了我的底线").exists())
+        {
+            toastLog("检测到底线，未找到未作答题目...")
+            back();//退到答题种类
+            sleep(1000);
+            back();//退到我的
+            sleep(1000);
+            toastLog('题目已做完，每周答题任务执行结束！')
+            back();//退到主页
+            sleep(1000);
+            return;
+        }
         toastLog("向下翻页...")
         className("android.view.View").scrollable(true).findOne().scrollDown();
-        sleep(500);
+        sleep(500); 
     }
     desc("未作答").findOnce().click();
     sleep(1000);
@@ -2182,8 +2194,24 @@ function doSpecialQuiz()
     //找到专项答题控件，点击进入
     desc("专项答题").findOne().click();
     sleep(2000);
+    var overdue = 0;
     while(desc("开始答题").findOnce()==null)
     {
+        if(desc("已过期").findOnce()!=null)
+        {
+            overdue++;
+            if(overdue>4){
+                toastLog("检测到4个以上已过期题目，自动退出专项答题...")
+                back();//退到答题种类列表
+                sleep(1000);
+                back();//退到我的
+                sleep(1000);
+                toastLog('专项答题任务执行结束！')
+                back();
+                sleep(1000);
+                return;
+            }
+        }
         toastLog("向下翻页...")
         className("android.view.View").scrollable(true).findOne().scrollDown();
         sleep(500);
