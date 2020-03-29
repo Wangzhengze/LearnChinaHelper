@@ -10,7 +10,7 @@ var form = {
 ui.layout(
     <vertical>
         <appbar>
-            <toolbar id="toolbar" title="强国助手 V2.0.6"/>
+            <toolbar id="toolbar" title="强国助手 V2.0.7"/>
         </appbar>
         <Switch id="autoService" text="无障碍服务" checked="{{auto.service != null}}" padding="8 8 8 8" textSize="15sp"/>
         <ScrollView>
@@ -119,7 +119,7 @@ ui.emitter.on("options_item_selected", (e, item)=>{
             app.startActivity('console');
             break;
         case "关于":
-            alert("关于", "强国助手 v2.0.6\n1.优化每周答题已经无题可答的边界情况\n2.优化专项答题已经无题可答的边界情况");
+            alert("关于", "强国助手 v2.0.7\n1.优化挑战答题中无法获取选项后的处理办法");
             break;
     }
     e.consumed = true;
@@ -2278,7 +2278,6 @@ function doSpecialQuiz()
     }
 }
 
-
 /**
  * 通过网络接口进行搜题
  * @param  keyword 
@@ -2301,7 +2300,6 @@ function getTzAnswer(keyword) {
      }
 }
  
- 
  /**
   * 标记正确答案
   * @param {*} x 
@@ -2320,139 +2318,149 @@ function drawfloaty(x, y) {
      //window.close();
 }
  
- 
 /**
  * 挑战答题入口
  */
 function tiaoZhan() {
-     toastLog("尝试爬取网络结果...")
-     let failDo = false;
-     //提取题目
-     if (className("android.widget.ListView").exists()) {
-         var _timu = className("android.widget.ListView").findOnce().parent().child(0).desc();
-     } else {
-         //back();
-         toastLog("提取题目失败");
-         failDo = true;
-         // beep();
-         return;
-     }
-     log("题目为:"+_timu);
-     var chutiIndex = _timu.lastIndexOf("出题单位");
-     if (chutiIndex != -1) {
-         _timu = _timu.substring(0, chutiIndex - 2);
-     }
-     var timuOld = _timu;
-     _timu = _timu.replace(/\s/g, "");
- 
-     //提取选项
-     var ansTimu = [];
-     if (className("android.widget.ListView").exists()) {
-         sleep(500);
-         className("android.widget.ListView").findOne().children().forEach(function(c){
-             var answer_q = c.child(0).child(1).desc();
-             ansTimu.push(answer_q);
-         });
-     } else {
-         toastLog("答案选项获取失败");
-         failDo = true;
-         return;
-     }
-     log("ansTimu:"+ansTimu);
-     sleep(300);
- 
-     var answer = "";
-     var ansFind = "";
- 
- 
-     log("search:" + timuOld);
-     
-     var ansNet =  getTzAnswer(timuOld);
-     sleep(500);
-     //遍历题中的答案
-     log("网络答案: " + ansNet);
-     for (let item of ansTimu) {
-         log("item:"+item);
-         var indexFind = ansNet.indexOf(item);
-         if (indexFind != -1) {
-             ansFind = item;
-             break;
-         }
-     }
-     log("匹配结果: " + ansFind);
-     if (ansFind != "") {
-         answer = ansFind;
-     } else {
-         //网络也没找到，那么随机咯
-         log("网络匹配失败，随机选择....");
-         let randomIndex = random(0, ansTimu.length - 1);
-         answer = ansTimu[randomIndex];
-         // beep();
-         //sleep(10*1000);
-         //return;
-     }
-     
-     //开始点击
-     if (className("android.view.View").desc(answer).exists()) {
-         //RadioButton位置
-         var b = className("android.view.View").desc(answer).findOnce().parent().child(0).bounds();
-         var tipsWindow = drawfloaty(b.centerX(), b.centerY());
-         sleep(300);
-         //点击RadioButton
-         className("android.view.View").desc(answer).findOnce().parent().child(0).click();
-         sleep(300);
-         tipsWindow.close();
-     } else {
-         toastLog("点击答案失败");
-         failDo = true;
-     }
-     sleep(1000);
+    toastLog("尝试爬取网络结果...")
+    let failDo = false;
+    //提取题目
+    if (className("android.widget.ListView").exists()) {
+        var _timu = className("android.widget.ListView").findOnce().parent().child(0).desc();
+    } else {
+        //back();
+        toastLog("提取题目失败");
+        failDo = true;
+        // beep();
+        return;
+    }
+    log("题目为:"+_timu);
+    var chutiIndex = _timu.lastIndexOf("出题单位");
+    if (chutiIndex != -1) {
+        _timu = _timu.substring(0, chutiIndex - 2);
+    }
+    var timuOld = _timu;
+    _timu = _timu.replace(/\s/g, "");
+
+    //提取选项
+    var ansTimu = [];
+    if (className("android.widget.ListView").exists()) {
+        sleep(500);
+        // log("ListView:"+className("android.widget.ListView").findOne())
+        className("android.widget.ListView").findOne().children().forEach(function(c){
+            // log("c.child(0).child(1):"+c.child(0).child(1));
+            ansTimu.push(c.child(0).child(1).desc());
+        });
+    } else {
+        toastLog("答案选项获取失败...");
+        failDo = true;
+        return;
+    }
+    log("获取的选项内容:"+ansTimu);
+    //未获取到选项
+    if(ansTimu[0]==null||ansTimu[0]=="")
+    {
+        toastLog("获取选项内容失败，默认选择第一个...");
+        className("android.widget.RadioButton").findOne().click();
+        sleep(1000);
+    }
+    sleep(300);
+    var answer = "";
+    var ansFind = "";
+
+
+    log("search:" + timuOld);
+    
+    var ansNet =  getTzAnswer(timuOld);
+    sleep(500);
+    //遍历题中的答案
+    log("网络答案: " + ansNet);
+    for (let item of ansTimu) {
+        log("item:"+item);
+        var indexFind = ansNet.indexOf(item);
+        if (indexFind != -1) {
+            ansFind = item;
+            break;
+        }
+    }
+    log("匹配结果: " + ansFind);
+    if (ansFind != "") {
+        answer = ansFind;
+    } else {
+        //网络也没找到，那么随机咯
+        log("网络匹配失败，随机选择....");
+        let randomIndex = random(0, ansTimu.length - 1);
+        answer = ansTimu[randomIndex];
+        // beep();
+        //sleep(10*1000);
+        //return;
+    }
+    
+    //开始点击
+    if (className("android.view.View").desc(answer).exists()) {
+        //RadioButton位置
+        var b = className("android.view.View").desc(answer).findOnce().parent().child(0).bounds();
+        var tipsWindow = drawfloaty(b.centerX(), b.centerY());
+        sleep(300);
+        //点击RadioButton
+        className("android.view.View").desc(answer).findOnce().parent().child(0).click();
+        sleep(300);
+        tipsWindow.close();
+    } else {
+        toastLog("点击答案失败");
+        failDo = true;
+    }
+    sleep(1000);
 }
- 
+
 function begin() {
-     var i = 0;
-     while (true) {
-         //判断中途结束，可复活
-         sleep(1000);
-         if(className("android.view.View").depth(21).indexInParent(2).findOnce()!=null)
-         {
-             back();
-             while(id("message").text("提交中...").exists());
-             while(className("android.widget.Button").descContains("重试").exists()){
-                 log("网络不佳，点击重试...");
-                 className("android.widget.Button").descContains("重试").click();
-                 sleep(500);
-             }
-             
-         }
-         sleep(1000);
-         //判断结束
-         if (className("android.view.View").descContains("本次答对").exists()) {
-             toastLog("等待3s至页面加载完成...");
-             sleep(3000);
-             if(className("android.view.View").descContains("领取奖励已达今日上限").exists())
-             {
-                 toastLog("挑战答题当日积分已满...");
-                 break;
-             }
-             else{
-                 className("android.view.View").desc("再来一局").findOne().click();
-                 i = 0;
-                 sleep(4000);
-                 
-             }
-         }
-         tiaoZhan();
-         sleep(1000);
-         i++;
-         log("循环次数：" +i)
-         if (i > 11) {
-             //剩下的题随便选，直到错了为止
-             toastLog("连续答对超过10题以上，默认选第一个...")
-             className("android.widget.RadioButton").clickable(true).findOnce().click();
-             // break;
-         }
-     }
+    var i = 0;
+    while (true) {
+        //判断中途结束，可复活
+        sleep(1000);
+        if(className("android.view.View").depth(21).indexInParent(2).findOnce()!=null)
+        {
+            back();
+            while(id("message").text("提交中...").exists());
+            while(className("android.widget.Button").descContains("重试").exists()){
+                log("网络不佳，点击重试...");
+                className("android.widget.Button").descContains("重试").click();
+                sleep(500);
+            }
+            
+        }
+        sleep(1000);
+        //判断结束
+        if (className("android.view.View").descContains("本次答对").exists()) {
+            toastLog("等待3s至页面加载完成...");
+            sleep(3000);
+            if(className("android.view.View").descContains("领取奖励已达今日上限").exists())
+            {
+                toastLog("挑战答题当日积分已满...");
+                break;
+            }
+            else{
+                // className("android.view.View").desc("再来一局").findOne().click();
+                // sleep(4000);
+                back();
+                sleep(2000);
+                desc("挑战答题").findOne().click();
+                i = 0;
+                sleep(3500);
+
+            }
+        }
+        tiaoZhan();
+        sleep(1000);
+        i++;
+        log("循环次数：" +i)
+        if (i > 11) {
+            //剩下的题随便选，直到错了为止
+            toastLog("连续答对超过10题以上，默认选第一个...")
+            className("android.widget.RadioButton").clickable(true).findOnce().click();
+            // break;
+        }
+    }
 }
  
 /**
