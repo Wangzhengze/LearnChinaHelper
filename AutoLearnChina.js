@@ -12,13 +12,12 @@ ui.layout(
     <drawer id="drawer">
     <vertical>
         <appbar>
-            <toolbar id="toolbar" title="强国助手 V2.0.9"/>
+            <toolbar id="toolbar" title="强国助手 V2.1.0"/>
             <tabs id="tabs"/>
         </appbar>
         <Switch id="autoService" text="无障碍服务" checked="{{auto.service != null}}" padding="8 8 8 8" textSize="15sp"/>
         <viewpager id="viewpager">
             <frame>
-                
                 <ScrollView>
                 <vertical>
                     {/* <frame height="40" gravity="center">
@@ -161,9 +160,8 @@ ui.emitter.on("options_item_selected", (e, item)=>{
             app.startActivity('console');
             break;
         case "关于":
-            alert("关于", "强国助手 v2.0.9\n"+
-            "1.将订阅任务变为可选任务（方便已经订阅完所有订阅号的用户）\n"+
-            "2.更改界面UI布局，加入免责声明条款\n"+
+            alert("关于", "强国助手 v2.1.0\n"+
+            "1.优化了专项答题循环查看题干内容的bug\n"+
             "\nCopyright©2020 by Txy 一岸流年1998");
             break;
     }
@@ -230,6 +228,7 @@ ui.autoService.on("check", function(checked) {
 ui.emitter.on("resume", function() {
     // 此时根据无障碍服务的开启情况，同步开关的状态
     ui.autoService.checked = auto.service != null;
+    
 });
 
 ui.start.on("click", function(){
@@ -1837,15 +1836,30 @@ function specialQuiz() {
         
         //首先检查题目的空格与选项的个数是否相等，若相等则全选
         var question = className("android.view.View").descMatches(v).findOnce()
+        var t = 0;
         while(question==null){
+            if(t>15){
+                toastLog("题目内容控件搜索失败，退出循环...")
+                break;
+            }
             toastLog("重新搜索题干内容...")
             sleep(1000);
             question = className("android.view.View").descMatches(v).findOnce()
+            t++;
         }
-        questionText = question.desc()
+        var questionText = ""
+        if(question!=null){
+            questionText = question.desc()
+        }
+        else{
+            questionText = "e e";//盲猜一个空，反正不相等会去找提示
+        }
+        log("questionText:"+questionText);
         var reg = /\S\s+(?=\S)/g;
         // toastLog(questionText.match(reg).length)
         var blankCnt = questionText.match(reg).length //空格个数
+        log("题目空格："+className("android.widget.ListView").findOnce().children().length)
+        log("选项数量："+blankCnt)
         if (className("android.widget.ListView").findOnce().children().length==blankCnt){
             toastLog("匹配到题目空格与选项相等，直接全选...")
             className("android.widget.ListView").findOnce().children().forEach(function(child) {
@@ -1857,9 +1871,8 @@ function specialQuiz() {
         else{
             desc("查看提示").click()
             sleep(1000);
-            // var hint = className("android.view.View").depth(21).indexInParent(1).drawingOrder(0).findOne().child(0).desc()
-            var hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOnce();
-            
+            var hint = className("android.view.View").depth(21).indexInParent(0).drawingOrder(0).findOnce(2)
+            // log(hint)
             while(hint==null||hint.desc()=="")
             {
                 back()
@@ -1867,7 +1880,8 @@ function specialQuiz() {
                 toastLog("重新搜索提示...");
                 desc("查看提示").click();
                 sleep(1000);
-                hint = className("android.view.View").clickable(true).indexInParent(0).depth(22).drawingOrder(0).findOnce();
+                hint = className("android.view.View").depth(21).indexInParent(0).drawingOrder(0).findOnce(2)
+                // log(hint)
             }
             log("提示："+hint.desc())
             back()
