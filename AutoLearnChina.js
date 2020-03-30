@@ -5,107 +5,144 @@ var form = {
     isDailyQuiz:false,
     isWeeklyQuiz:false,
     isSpecialQuiz:false,
-    isChallengeQuiz:false
+    isChallengeQuiz:false,
+    isSubscribe:false
 }
 ui.layout(
+    <drawer id="drawer">
     <vertical>
         <appbar>
-            <toolbar id="toolbar" title="强国助手 V2.0.8"/>
+            <toolbar id="toolbar" title="强国助手 V2.0.9"/>
+            <tabs id="tabs"/>
         </appbar>
         <Switch id="autoService" text="无障碍服务" checked="{{auto.service != null}}" padding="8 8 8 8" textSize="15sp"/>
-        <ScrollView>
-        <vertical>
-        <frame height="40" gravity="center">
-            <text text="*注意*" gravity="center" textSize="18sp" textColor="red" textStyle="bold"/>
-        </frame>
-        <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
-            cardElevation="1dp" gravity="center_vertical">
-            <ScrollView>
-            <vertical padding="18 8" h="auto">
-                <text text="项目说明文档: (请留意新版本的发布)" textColor="#222222" textSize="14sp"/>
-                <text autoLink="web" text="https://github.com/XiangyuTang/LearnChinaHelper "/>
-            </vertical>
-            </ScrollView>
-            <View bg="#f44336" h="*" w="10"/>
-        </card>
-        <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
-            cardElevation="1dp" gravity="center_vertical">
-            <ScrollView>
-            <vertical padding="18 8" h="auto">
-                <text text="1.首次安装请先开启无障碍服务和截图与允许通知权限" textColor="#222222" textSize="14sp"/>
-                <text text="2.若未开启通知权限,首次使用建议打开↗的悬浮窗权限" textColor="#222222" textSize="14sp"/>
-                <text text="3.开始运行前请先关闭学习强国,由脚本运行后自动启动" textColor="#222222" textSize="14sp"/>
-                <text text="4.脚本执行过程中请勿操作手机" textColor="#222222" textSize="14sp"/>
-            </vertical>
-            </ScrollView>
-            <View bg="#f44336" h="*" w="10"/>
-        </card>
-        <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
-            cardElevation="1dp" gravity="center_vertical">
-            <ScrollView>
-            <vertical padding="18 8" h="auto">
-                <text text="当前版本强国助手支持的必选任务包括：(以下任务预计花费7分钟)" textColor="#222222" textSize="14sp"/>
-                <text text="阅读文章、视听学习、收藏、分享、订阅、评论、本地频道" textColor="#999999" textSize="14sp"/>
-            </vertical>
-            </ScrollView>
-            <View bg="#4caf50" h="*" w="10"/>
-        </card>
-        <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
-            cardElevation="1dp" gravity="center_vertical">
-            <ScrollView>
-            <vertical padding="18 8" h="auto">
-                <text text="坚持把学习贯彻习近平总书记系列重要讲话精神作为重大政治任务，认真学习党的先进理论与指导思想，请勿利用本软件投机取巧." textColor="#222222"/>
-            </vertical>
-            </ScrollView>
-            <View bg="#4caf50" h="*" w="10"/>
-        </card>
-
-        <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
-            cardElevation="1dp" gravity="center_vertical">
-            <ScrollView>
-            <vertical padding="18 8" h="auto">
-                <text text="长时任务选择：" textColor="#222222"/>
-                <checkbox id="yes_read" text="文章学习时长任务(预计花费12分钟)" />
-                <checkbox id="yes_watch" text="视听学习时长任务(建议在wifi环境下执行，预计花费18分钟)" marginTop="5"/>
-            </vertical>
-            </ScrollView>
-            <View bg="#2196f3" h="*" w="10"/>
-        </card>
-        <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
-            cardElevation="1dp" gravity="center_vertical">
-            <ScrollView>
-            <vertical padding="18 8" h="auto">
-                <text text="答题任务选择：" textColor="#222222"/>
-                <checkbox id="daily_quiz" text="每日答题(预计花费2分钟)" />
-                <checkbox id="weekly_quiz" text="每周答题(预计花费2分钟)" marginTop="5"/>
-                <checkbox id="special_quiz" text="专项答题(预计花费2分钟)" marginTop="5"/>
-                <checkbox id="challenge_quiz" text="挑战答题(预计花费2分钟)" marginTop="5"/>
-            </vertical>
-            </ScrollView>
-            <View bg="#2196f3" h="*" w="10"/>
-        </card>
-        
-
-        <linear gravity="center">
-            <button id="start" text="开始运行" style="Widget.AppCompat.Button.Colored" w="auto"/>
-            <button id="stop" text="停止运行"  w="auto"/>
-        </linear>
-        <frame height="20" gravity="center">
-            <text text="---------------------------------------------------------------------------------------------------------------------------------" gravity="center"/>
-        </frame>
-        <frame height="50" gravity="center">
-            <text text="Copyright©2020 by Txy 一岸流年1998" gravity="center"/>
-        </frame>
-        </vertical>
-        </ScrollView>
+        <viewpager id="viewpager">
+            <frame>
+                
+                <ScrollView>
+                <vertical>
+                    {/* <frame height="40" gravity="center">
+                        <text text="*注意*" gravity="center" textSize="18sp" textColor="red" textStyle="bold"/>
+                    </frame> */}
+                    <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+                        cardElevation="1dp" gravity="center_vertical">
+                        <ScrollView>
+                        <vertical padding="18 8" h="auto">
+                            <text text="项目说明文档: (请留意新版本的发布)" textColor="#222222" textSize="14sp"/>
+                            <text autoLink="web" text="https://github.com/XiangyuTang/LearnChinaHelper "/>
+                        </vertical>
+                        </ScrollView>
+                        <View bg="#f44336" h="*" w="10"/>
+                    </card>
+                    <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+                        cardElevation="1dp" gravity="center_vertical">
+                        <ScrollView>
+                        <vertical padding="18 8" h="auto">
+                            <text text="1.首次安装请先开启无障碍服务和截图与允许通知权限" textColor="#222222" textSize="14sp"/>
+                            <text text="2.若未开启通知权限,首次使用建议打开↗的悬浮窗权限" textColor="#222222" textSize="14sp"/>
+                            <text text="3.开始运行前请先关闭学习强国,由脚本运行后自动启动" textColor="#222222" textSize="14sp"/>
+                            <text text="4.脚本执行过程中请勿操作手机" textColor="#222222" textSize="14sp"/>
+                        </vertical>
+                        </ScrollView>
+                        <View bg="#f44336" h="*" w="10"/>
+                    </card>
+                    <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+                        cardElevation="1dp" gravity="center_vertical">
+                        <ScrollView>
+                        <vertical padding="18 8" h="auto">
+                            <text text="坚持把学习贯彻习近平总书记系列重要讲话精神作为重大政治任务，认真学习党的先进理论与指导思想。" textColor="#222222"/>
+                            <text text="请勿利用本软件投机取巧！" textColor="#222222" textStyle="bold"/>
+                        </vertical>
+                        </ScrollView>
+                        <View bg="#f44336" h="*" w="10"/>
+                    </card>
+                    <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+                        cardElevation="1dp" gravity="center_vertical">
+                        <ScrollView>
+                        <vertical padding="18 8" h="auto">
+                            <text text="免责声明（详情参见项目文档）" textColor="#222222" textStyle="bold"/>
+                            <text text="1.《强国助手》为本人Auto.js学习交流的开源非营利项目，仅作为程序员之间相互学习交流之用，使用需严格遵守开源许可协议。禁止使用《强国助手》进行任何盈利活动。对一切非法使用所产生的后果，本人概不负责。" textColor="#222222" marginTop="5"/>
+                            <text text="2.本项目不提倡每天利用脚本软件来刷《学习强国》积分。" textColor="#222222"/>
+                            <text text="3.若每天一直使用，不保证不会具有封号风险。" textColor="#222222" />
+                            <text text="4.经向专业律师咨询，本声明有效，具有法律效力。" textColor="#222222" />
+                        </vertical>
+                        </ScrollView>
+                        <View bg="#f44336" h="*" w="10"/>
+                    </card>
+                </vertical>
+                </ScrollView>
+            </frame>
+            <frame>
+                <ScrollView>
+                <vertical>
+                    <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+                        cardElevation="1dp" gravity="center_vertical">
+                        <ScrollView>
+                        <vertical padding="18 8" h="auto">
+                            <text text="当前版本强国助手支持的必选任务包括：(以下任务预计花费6分钟)" textColor="#222222" textSize="14sp"/>
+                            <text text="阅读文章、视听学习、收藏、分享、评论、本地频道" textColor="#999999" textSize="14sp"/>
+                        </vertical>
+                        </ScrollView>
+                        <View bg="#4caf50" h="*" w="10"/>
+                    </card>
+                    <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+                        cardElevation="1dp" gravity="center_vertical">
+                        <ScrollView>
+                        <vertical padding="18 8" h="auto">
+                            <text text="是否执行订阅任务：(预计花费1分钟)" textColor="#222222"/>
+                            <radiogroup columns="2">
+                                <radio id="yes_subscribe"  text="是" marginTop="5"></radio>
+                                <radio  id="no_subscribe" text="否" checked = "true" ></radio>
+                            </radiogroup>
+                        </vertical>
+                        </ScrollView>
+                        <View bg="#2196f3" h="*" w="10"/>
+                    </card>
+                    <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+                        cardElevation="1dp" gravity="center_vertical">
+                        <ScrollView>
+                        <vertical padding="18 8" h="auto">
+                            <text text="长时任务选择：" textColor="#222222"/>
+                            <checkbox id="yes_read" text="文章学习时长任务(预计花费12分钟)" />
+                            <checkbox id="yes_watch" text="视听学习时长任务(建议在wifi环境下执行，预计花费18分钟)" marginTop="5"/>
+                        </vertical>
+                        </ScrollView>
+                        <View bg="#2196f3" h="*" w="10"/>
+                    </card>
+                    <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+                        cardElevation="1dp" gravity="center_vertical">
+                        <ScrollView>
+                        <vertical padding="18 8" h="auto">
+                            <text text="答题任务选择：" textColor="#222222"/>
+                            <checkbox id="daily_quiz" text="每日答题(预计花费2分钟)" />
+                            <checkbox id="weekly_quiz" text="每周答题(预计花费2分钟)" marginTop="5"/>
+                            <checkbox id="special_quiz" text="专项答题(预计花费2分钟)" marginTop="5"/>
+                            <checkbox id="challenge_quiz" text="挑战答题(预计花费2分钟)" marginTop="5"/>
+                        </vertical>
+                        </ScrollView>
+                        <View bg="#2196f3" h="*" w="10"/>
+                    </card>
+                    <linear gravity="center">
+                        <button id="start" text="开始运行" style="Widget.AppCompat.Button.Colored" w="auto"/>
+                        <button id="stop" text="停止运行"  w="auto"/>
+                    </linear>
+                </vertical>
+                </ScrollView>
+            </frame>
+        </viewpager>
     </vertical>
+    </drawer>
 );
-
+//设置滑动页面的标题
+ui.viewpager.setTitles(["使用须知", "任务列表"]);
+//让滑动页面和标签栏联动
+ui.tabs.setupWithViewPager(ui.viewpager);
 //检测用户版本更新
 threads.start(detectUpdate);
 //创建选项菜单(右上角)
 ui.emitter.on("create_options_menu", menu=>{
     menu.add("启动悬浮窗");
+    menu.add("检查新版本");
     menu.add("运行日志");
     menu.add("关于");
 });
@@ -117,16 +154,29 @@ ui.emitter.on("options_item_selected", (e, item)=>{
             intent.setAction("android.settings.action.MANAGE_OVERLAY_PERMISSION");
             app.startActivity(intent);
             break;
+        case "检查新版本":
+            threads.start(detectUpdate);
+            break;
         case "运行日志":
             app.startActivity('console');
             break;
         case "关于":
-            alert("关于", "强国助手 v2.0.8\n1.增加向用户主动推送版本更新通知的功能");
+            alert("关于", "强国助手 v2.0.9\n"+
+            "1.将订阅任务变为可选任务（方便已经订阅完所有订阅号的用户）\n"+
+            "2.更改界面UI布局，加入免责声明条款\n"+
+            "\nCopyright©2020 by Txy 一岸流年1998");
             break;
     }
     e.consumed = true;
 });
 activity.setSupportActionBar(ui.toolbar);
+
+ui.yes_subscribe.on("check",function(check){
+    if(check)
+        form.isSubscribe= true;
+    else
+        form.isSubscribe= false;
+});
 ui.yes_read.on("check",function(check){
     if(check)
         form.isLongRead= true;
@@ -255,8 +305,8 @@ function detectUpdate()
         var latestRelease = release_info[1];
         if(latestRelease!=currentRelease){
             dialogs.build({
-                title: "发现新版本",
-                content: release_info[0]+"\n"+release_info[2],
+                title: "发现新版本(/≧▽≦)/",
+                content: "(下载后请先卸载旧版本再安装新版本)\n"+release_info[0]+"\n"+release_info[2],
                 positive: "到浏览器下载",
                 negative: "取消",
             })
@@ -389,12 +439,6 @@ function doUnfinishedTask(){
                 learnVideo(rest_num,read_article_flag,8,false);//默认观看8s,执行短时视听任务
                 continue;
             }
-            else if(task.title=='订阅'){
-                flag = 1;
-                rest_num = task.targetIntegral-task.getIntegral;
-                subscribe(rest_num);
-                continue;
-            }
             else if(task.title=='分享'){
                 flag = 1;
                 share();
@@ -415,6 +459,12 @@ function doUnfinishedTask(){
                 localChannel();
                 continue;
             }
+            // else if(task.title=='订阅'){
+            //     flag = 1;
+            //     rest_num = task.targetIntegral-task.getIntegral;
+            //     subscribe(rest_num);
+            //     continue;
+            // }
             // else if(task.title=='每日答题'){
             //     doDailyQuiz();
             //     continue;
@@ -444,6 +494,16 @@ function doExtraTask(){
     toastLog('执行额外脚本任务....')
     sleep(1000);
     var read_article_flag = 2;
+    if(form.isSubscribe)
+    {
+        for(i=0;i<taskInfoList.length;i++){
+            var task = taskInfoList[i];
+            if(task.getIntegral < task.targetIntegral&&task.title=='订阅'){
+                rest_num = task.targetIntegral-task.getIntegral;
+                subscribe(rest_num);
+            }
+        }
+    }
     if(form.isDailyQuiz)
     {
         for(i=0;i<taskInfoList.length;i++){
