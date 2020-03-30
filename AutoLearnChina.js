@@ -10,7 +10,7 @@ var form = {
 ui.layout(
     <vertical>
         <appbar>
-            <toolbar id="toolbar" title="强国助手 V2.0.7"/>
+            <toolbar id="toolbar" title="强国助手 V2.0.8"/>
         </appbar>
         <Switch id="autoService" text="无障碍服务" checked="{{auto.service != null}}" padding="8 8 8 8" textSize="15sp"/>
         <ScrollView>
@@ -101,6 +101,8 @@ ui.layout(
     </vertical>
 );
 
+//检测用户版本更新
+threads.start(detectUpdate);
 //创建选项菜单(右上角)
 ui.emitter.on("create_options_menu", menu=>{
     menu.add("启动悬浮窗");
@@ -119,7 +121,7 @@ ui.emitter.on("options_item_selected", (e, item)=>{
             app.startActivity('console');
             break;
         case "关于":
-            alert("关于", "强国助手 v2.0.7\n1.优化挑战答题中无法获取选项后的处理办法");
+            alert("关于", "强国助手 v2.0.8\n1.增加向用户主动推送版本更新通知的功能");
             break;
     }
     e.consumed = true;
@@ -196,7 +198,84 @@ ui.stop.on("click",function(){
     toast("已终止执行脚本");
 });
 
+//检测用户版本更新方法
+function getLatestRelease() {
+    //keyword =  encodeURI(encodeURI(keyword));
+    var url = "https://api.github.com/repos/XiangyuTang/LearnChinaHelper/releases/latest";
+    //设置超时为10秒
+    http.__okhttp__.setTimeout(10000);
+    // 获取一个不存在的网站，应该会Timeout （或者把网络断开）
+    try{
+      var res = http.get(url)
+    }
+    catch(e)
+    {
+        log("error:"+e)
+        return;
+    }
+    if(res.statusCode != 200){
+      log("请求连接github失败: " + res.statusCode + " " + res.statusMessage);
+      return;
+    }else{
+      // var ans = res.body.json();
+      let html = res.body.string();  //取页面html源码
+      // log(html)
+      let json = JSON.parse(html);
+    //   log("APP名:"+json.name)
+      log("最新版本号："+json.tag_name)
+    //   log("更新内容："+json.body)
+    //   log("下载链接："+json.assets[1].browser_download_url)
+      return [json.name,json.tag_name,json.body,json.assets[1].browser_download_url];
+    }
+}
 
+
+function getCurrentRelease(){
+    sleep(1000);
+    var current_name = className("android.widget.TextView").textContains("强国助手 V").findOnce();
+    // while(current_name==null){
+    //     current_name = className("android.widget.TextView").textContains("强国助手 V").findOnce();
+    // }
+    if(current_name!=null)
+    {
+        log(current_name.text())
+        var strs= new Array(); //定义一数组
+        strs=current_name.text().split(" "); //字符分割 
+        log("当前用户版本号："+strs[1]);
+        return strs[1];
+    }
+}
+
+function detectUpdate()
+{
+    var currentRelease = getCurrentRelease();
+    var release_info = getLatestRelease()
+    if(release_info!=null)
+    {
+        var latestRelease = release_info[1];
+        if(latestRelease!=currentRelease){
+            dialogs.build({
+                title: "发现新版本",
+                content: release_info[0]+"\n"+release_info[2],
+                positive: "到浏览器下载",
+                negative: "取消",
+            })
+            .on("positive", () => {
+                app.openUrl(release_info[3]);
+            })
+            .show();
+        }
+        else{
+            toastLog("您的版本目前是最新版本~");
+        }
+    }
+    else{
+        toastLog("目前无法获取github最新版本api，请您自行留意github新版本的通知！")
+    }
+}
+
+
+//以下是核心功能执行方法
 function main() {
     // 这里写脚本的主逻辑
     threads.start(function () {
@@ -2457,7 +2536,11 @@ function begin() {
         if (i > 11) {
             //剩下的题随便选，直到错了为止
             toastLog("连续答对超过10题以上，默认选第一个...")
-            className("android.widget.RadioButton").clickable(true).findOnce().click();
+            var radiobutton = className("android.widget.RadioButton").clickable(true).findOnce();
+            if(radiobutton!=null)
+            {
+                radiobutton.click();
+            }
             // break;
         }
     }
