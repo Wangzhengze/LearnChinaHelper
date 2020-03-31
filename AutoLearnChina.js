@@ -12,7 +12,7 @@ ui.layout(
     <drawer id="drawer">
     <vertical>
         <appbar>
-            <toolbar id="toolbar" title="强国助手 V2.1.0"/>
+            <toolbar id="toolbar" title="强国助手 V2.1.1"/>
             <tabs id="tabs"/>
         </appbar>
         <Switch id="autoService" text="无障碍服务" checked="{{auto.service != null}}" padding="8 8 8 8" textSize="15sp"/>
@@ -23,12 +23,22 @@ ui.layout(
                     {/* <frame height="40" gravity="center">
                         <text text="*注意*" gravity="center" textSize="18sp" textColor="red" textStyle="bold"/>
                     </frame> */}
-                    <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+                    {/* <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
                         cardElevation="1dp" gravity="center_vertical">
                         <ScrollView>
                         <vertical padding="18 8" h="auto">
                             <text text="项目说明文档: (请留意新版本的发布)" textColor="#222222" textSize="14sp"/>
                             <text autoLink="web" text="https://github.com/XiangyuTang/LearnChinaHelper "/>
+                        </vertical>
+                        </ScrollView>
+                        <View bg="#f44336" h="*" w="10"/>
+                    </card> */}
+                    <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+                        cardElevation="1dp" gravity="center_vertical">
+                        <ScrollView>
+                        <vertical padding="18 8" h="auto">
+                            <text text="应用与版本要求：" textColor="#222222" textSize="14sp"/>
+                            <text text="学习强国v2.10.0，安卓7.0以上 "marginTop="5" textColor="#222222"/>
                         </vertical>
                         </ScrollView>
                         <View bg="#f44336" h="*" w="10"/>
@@ -59,7 +69,7 @@ ui.layout(
                         cardElevation="1dp" gravity="center_vertical">
                         <ScrollView>
                         <vertical padding="18 8" h="auto">
-                            <text text="免责声明（详情参见项目文档）" textColor="#222222" textStyle="bold"/>
+                            <text text="免责声明" textColor="#222222" textStyle="bold"/>
                             <text text="1.《强国助手》为本人Auto.js学习交流的开源非营利项目，仅作为程序员之间相互学习交流之用，使用需严格遵守开源许可协议。禁止使用《强国助手》进行任何盈利活动。对一切非法使用所产生的后果，本人概不负责。" textColor="#222222" marginTop="5"/>
                             <text text="2.本项目不提倡每天利用脚本软件来刷《学习强国》积分。" textColor="#222222"/>
                             <text text="3.若每天一直使用，不保证不会具有封号风险。" textColor="#222222" />
@@ -137,7 +147,7 @@ ui.viewpager.setTitles(["使用须知", "任务列表"]);
 //让滑动页面和标签栏联动
 ui.tabs.setupWithViewPager(ui.viewpager);
 //检测用户版本更新
-threads.start(detectUpdate);
+// threads.start(detectUpdate);
 //创建选项菜单(右上角)
 ui.emitter.on("create_options_menu", menu=>{
     menu.add("启动悬浮窗");
@@ -160,9 +170,11 @@ ui.emitter.on("options_item_selected", (e, item)=>{
             app.startActivity('console');
             break;
         case "关于":
-            alert("关于", "强国助手 v2.1.0\n"+
-            "1.优化了专项答题循环查看题干内容的bug\n"+
-            "\nCopyright©2020 by Txy 一岸流年1998");
+            alert("关于", "强国助手 v2.1.1\n"+
+            "1.最终闭源稳定版发布\n"+
+            "2.轻轻的走，正如我轻轻的来~\n"+
+            "3.感谢您的支持与鼓励，我们有缘再见~\n"+
+            "\nCopyright©2020 by 一岸流年1998");
             break;
     }
     e.consumed = true;
@@ -297,30 +309,31 @@ function getCurrentRelease(){
 
 function detectUpdate()
 {
-    var currentRelease = getCurrentRelease();
-    var release_info = getLatestRelease()
-    if(release_info!=null)
-    {
-        var latestRelease = release_info[1];
-        if(latestRelease!=currentRelease){
-            dialogs.build({
-                title: "发现新版本(/≧▽≦)/",
-                content: "(下载后请先卸载旧版本再安装新版本)\n"+release_info[0]+"\n"+release_info[2],
-                positive: "到浏览器下载",
-                negative: "取消",
-            })
-            .on("positive", () => {
-                app.openUrl(release_info[3]);
-            })
-            .show();
-        }
-        else{
-            toastLog("您的版本目前是最新版本~");
-        }
-    }
-    else{
-        toastLog("目前无法获取github最新版本api，请您自行留意github新版本的通知！")
-    }
+    toastLog("您的版本目前是最新版本~");
+    // var currentRelease = getCurrentRelease();
+    // var release_info = getLatestRelease()
+    // if(release_info!=null)
+    // {
+    //     var latestRelease = release_info[1];
+    //     if(latestRelease!=currentRelease){
+    //         dialogs.build({
+    //             title: "发现新版本(/≧▽≦)/",
+    //             content: "(下载后请先卸载旧版本再安装新版本)\n"+release_info[0]+"\n"+release_info[2],
+    //             positive: "到浏览器下载",
+    //             negative: "取消",
+    //         })
+    //         .on("positive", () => {
+    //             app.openUrl(release_info[3]);
+    //         })
+    //         .show();
+    //     }
+    //     else{
+    //         toastLog("您的版本目前是最新版本~");
+    //     }
+    // }
+    // else{
+    //     toastLog("目前无法获取github最新版本api，请您自行留意github新版本的通知！")
+    // }
 }
 
 
