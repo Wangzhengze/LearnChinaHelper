@@ -1533,6 +1533,14 @@ function dailyQuiz() {
     if (descContains("单选题").exists()) {
         sleep(1000);
         log("单选")
+        //有时候程序跑太快，所以就没点到上一个题答完后的下一题控件
+        if (desc("下一题").exists()) {
+            log("点击下一题")
+            sleep(500);
+            desc("下一题").click();
+            sleep(500);
+            return;
+        }
         desc("查看提示").click()
         sleep(1000);
         // var hint = className("android.view.View").depth(21).indexInParent(1).drawingOrder(0).findOne().child(0).desc()
